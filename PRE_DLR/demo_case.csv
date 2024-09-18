@@ -1,0 +1,6 @@
+case_id,class,fold-0,fold-1,fold-2,fold-3,fold-4,class_label
+1,low,training,training,training,training,validation,0
+2,low,training,validation,validation,training,training,0
+3,high,validation,training,training,training,training,1
+4,low,test,test,test,test,test,0
+5,high,test,test,test,test,test,1

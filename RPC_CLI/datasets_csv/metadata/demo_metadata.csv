@@ -1,0 +1,7 @@
+slide_id,case_id,class,class_label
+case1-1,1,high,1
+case1-2,1,high,1
+case2-1,2,low,0
+case2-2,2,low,0
+case2-3,2,low,0
+case3-1,3,low,0

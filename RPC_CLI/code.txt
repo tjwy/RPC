@@ -1,0 +1,2469 @@
+
+
+DATA_ROOT_DIR='/path/to/features/' # where are the TCGA features stored?
+BASE_DIR="/path/to/root/dir" # where is the repo cloned?
+STUDY="brca" # which disease are you working with?
+TYPE_OF_PATH="combine" # what type of pathways? 
+MODEL="survpath" # what type of model do you want to train?
+
+CUDA_VISIBLE_DEVICES=0 python main.py \
+    --study tcga_${STUDY} --task survival --split_dir splits --which_splits 5foldcv \
+    --type_of_path $TYPE_OF_PATH --modality $MODEL --data_root_dir $DATA_ROOT_DIR --label_file datasets_csv/metadata_all_endpoints/tcga_${STUDY}.csv \
+    --omics_dir datasets_csv/raw_rna_data/${TYPE_OF_PATH}/${STUDY} --results_dir "results_blca" \
+    --batch_size 1 --lr 0.0005 --opt radam --reg 0.0001 \
+    --alpha_surv 0.5 --weighted_sample --max_epochs 5 --encoding_dim 768 \
+    --label_col survival_months_dss --k 5 --bag_loss nll_surv --n_classes 4 --num_patches 4096 --wsi_projection_dim 256
+    
+# with nystrom attention
+CUDA_VISIBLE_DEVICES=0 python main.py \
+    --study tcga_${STUDY} --task survival --split_dir splits --which_splits 5foldcv \
+    --type_of_path $TYPE_OF_PATH --modality $MODEL --data_root_dir $DATA_ROOT_DIR --label_file datasets_csv/metadata_all_endpoints/tcga_${STUDY}.csv \
+    --omics_dir datasets_csv/raw_rna_data/${TYPE_OF_PATH}/${STUDY} --results_dir "results_blca" \
+    --batch_size 1 --lr 0.0005 --opt radam --reg 0.0001 \
+    --alpha_surv 0.5 --weighted_sample --max_epochs 5 --encoding_dim 768 \
+    --label_col survival_months_dss --k 5 --bag_loss nll_surv --n_classes 4 --num_patches 4096 --wsi_projection_dim 256 --use_nystrom
+    
+#：
+
+DATA_ROOT_DIR='/hpc2hdd/home/yangwu/WY/TCGA_data/DATA_ROOT_DIR' 
+BASE_DIR="/hpc2hdd/home/yangwu/WY/SurvPath" 
+STUDY="brca" 
+TYPE_OF_PATH="combine"
+MODEL="survpath"
+CUDA_VISIBLE_DEVICES=0 python main.py \
+    --study tcga_${STUDY} --task survival --split_dir splits --which_splits 5foldcv \
+    --type_of_path $TYPE_OF_PATH --modality $MODEL --data_root_dir $DATA_ROOT_DIR --label_file datasets_csv/metadata_all_endpoints/tcga_${STUDY}.csv \
+    --omics_dir datasets_csv/raw_rna_data/${TYPE_OF_PATH}/${STUDY} --results_dir "results_brca" \
+    --batch_size 1 --lr 0.0005 --opt radam --reg 0.0001 \
+    --alpha_surv 0.5 --weighted_sample --max_epochs 5 --encoding_dim 768 \
+    --label_col survival_months_dss --k 5 --bag_loss nll_surv --n_classes 4 --num_patches 4096 --wsi_projection_dim 256 --use_nystrom
+
+DATA_ROOT_DIR='/hpc2hdd/home/yangwu/WY/TCGA_data/DATA_ROOT_DIR' 
+BASE_DIR="/hpc2hdd/home/yangwu/WY/SurvPath" 
+STUDY="brca" 
+TYPE_OF_PATH="combine"
+MODEL="transmil_wsi"  
+CUDA_VISIBLE_DEVICES=0 python main.py \
+    --study tcga_${STUDY} --task survival --split_dir splits --which_splits 5foldcv \
+    --type_of_path $TYPE_OF_PATH --modality $MODEL --data_root_dir $DATA_ROOT_DIR --label_file datasets_csv/metadata_all_endpoints/tcga_${STUDY}.csv \
+    --omics_dir datasets_csv/raw_rna_data/${TYPE_OF_PATH}/${STUDY} --results_dir "results_brca" \
+    --batch_size 1 --lr 0.0005 --opt radam --reg 0.0001 \
+    --alpha_surv 0.5 --weighted_sample --max_epochs 5 \
+    --label_col survival_months_dss --k 5 --bag_loss nll_surv --n_classes 4 --num_patches 4096 --wsi_projection_dim 256 --encoding_layer_1_dim 768 --encoding_layer_2_dim 256
+    
+spilt TCGA-BH-A0BF pt， #，
+#
+DATA_ROOT_DIR='/hpc2hdd/home/yangwu/WY/TCGA_data/DATA_ROOT_DIR' 
+BASE_DIR="/hpc2hdd/home/yangwu/WY/SurvPath" 
+STUDY="brca" 
+TYPE_OF_PATH="combine"
+MODEL="survpath"  
+CUDA_VISIBLE_DEVICES=0 python main.py \
+    --study tcga_${STUDY} --task survival --split_dir splits --which_splits 5foldcv \
+    --type_of_path $TYPE_OF_PATH --modality $MODEL --data_root_dir $DATA_ROOT_DIR --label_file datasets_csv/metadata_all_endpoints/tcga_${STUDY}.csv \
+    --omics_dir datasets_csv/raw_rna_data/${TYPE_OF_PATH}/${STUDY} --results_dir "results_brca" \
+    --batch_size 1 --lr 0.0005 --opt radam --reg 0.0001 \
+    --alpha_surv 0.5 --weighted_sample --max_epochs 5 \
+    --label_col survival_months_dss --k 5 --bag_loss nll_surv --n_classes 4 --num_patches 4096 --wsi_projection_dim 256 --encoding_layer_1_dim 768 --encoding_layer_2_dim 256
+    
+DATA_ROOT_DIR='/hpc2hdd/home/yangwu/WY/TCGA_data/DATA_ROOT_DIR' 
+BASE_DIR="/hpc2hdd/home/yangwu/WY/SurvPath" 
+STUDY="brca" 
+TYPE_OF_PATH="combine"
+MODEL="survpath"  
+CUDA_VISIBLE_DEVICES=0 python main.py \
+    --study tcga_${STUDY} --task survival --split_dir splits --which_splits 5foldcv \
+    --type_of_path $TYPE_OF_PATH --modality $MODEL --data_root_dir $DATA_ROOT_DIR --label_file datasets_csv/metadata_all_endpoints/tcga_${STUDY}.csv \
+    --omics_dir datasets_csv/raw_rna_data/${TYPE_OF_PATH}/${STUDY} --results_dir "results_test" \
+    --batch_size 1 --lr 0.0005 --opt radam --reg 0.0001 \
+    --alpha_surv 0.5 --weighted_sample --max_epochs 5 \
+    --label_col survival_months_dss --k 5 --bag_loss nll_surv --n_classes 2 --num_patches 4096 --wsi_projection_dim 256 --encoding_layer_1_dim 768 --encoding_layer_2_dim 256
+
+###1-30     --use_nystrom （）
+DATA_ROOT_DIR='/hpc2hdd/home/yangwu/WY/TCGA_data/DATA_ROOT_DIR' 
+BASE_DIR="/hpc2hdd/home/yangwu/WY/SurvPath" 
+STUDY="brca" 
+TYPE_OF_PATH="combine"
+MODEL="survpath"  
+CUDA_VISIBLE_DEVICES=0 python main.py \
+    --study tcga_${STUDY} --task survival --split_dir splits --which_splits 5foldcv \
+    --type_of_path $TYPE_OF_PATH --modality $MODEL --data_root_dir $DATA_ROOT_DIR --label_file datasets_csv/metadata_all_endpoints/tcga_${STUDY}.csv \
+    --omics_dir datasets_csv/raw_rna_data/${TYPE_OF_PATH}/${STUDY} --results_dir "results_brca_new" \
+    --batch_size 1 --lr 0.0005 --opt radam --reg 0.0001 \
+    --alpha_surv 0.5 --weighted_sample --max_epochs 5 \
+    --label_col survival_months_dss --k 5 --bag_loss nll_surv --n_classes 4 --num_patches 4096 --wsi_projection_dim 256 --encoding_layer_1_dim 768 --encoding_layer_2_dim 256
+
+###1-30     --use_nystrom （）
+DATA_ROOT_DIR='/hpc2hdd/home/yangwu/WY/TCGA_data/DATA_ROOT_DIR' 
+BASE_DIR="/hpc2hdd/home/yangwu/WY/SurvPath" 
+STUDY="brca" 
+TYPE_OF_PATH="combine"
+MODEL="survpath"  
+CUDA_VISIBLE_DEVICES=0 python main.py \
+    --study tcga_${STUDY} --task survival --split_dir splits --which_splits 5foldcv \
+    --type_of_path $TYPE_OF_PATH --modality $MODEL --data_root_dir $DATA_ROOT_DIR --label_file datasets_csv/metadata_all_endpoints/tcga_${STUDY}.csv \
+    --omics_dir datasets_csv/raw_rna_data/${TYPE_OF_PATH}/${STUDY} --results_dir "results_brca_nclass2" \
+    --batch_size 1 --lr 0.0005 --opt radam --reg 0.0001 \
+    --alpha_surv 0.5 --weighted_sample --max_epochs 5 \
+    --label_col survival_months_dss --k 5 --bag_loss nll_surv --n_classes 2 --num_patches 4096 --wsi_projection_dim 256 --encoding_layer_1_dim 768 --encoding_layer_2_dim 256
+    
+###1-30     --use_nystrom （）
+DATA_ROOT_DIR='/hpc2hdd/home/yangwu/WY/TCGA_data/DATA_ROOT_DIR' 
+BASE_DIR="/hpc2hdd/home/yangwu/WY/SurvPath" 
+STUDY="brca" 
+TYPE_OF_PATH="combine"
+MODEL="survpath"  ~
+CUDA_VISIBLE_DEVICES=0 python main.py \
+    --study tcga_${STUDY} --task survival --split_dir splits --which_splits 5foldcv \
+    --type_of_path $TYPE_OF_PATH --modality $MODEL --data_root_dir $DATA_ROOT_DIR --label_file datasets_csv/metadata_all_endpoints/tcga_${STUDY}.csv \
+    --omics_dir datasets_csv/raw_rna_data/${TYPE_OF_PATH}/${STUDY} --results_dir "results_brca_check" \
+    --batch_size 1 --lr 0.0005 --opt radam --reg 0.0001 \
+    --alpha_surv 0.5 --weighted_sample --max_epochs 5 \
+    --label_col survival_months_dss --k 5 --bag_loss nll_surv --n_classes 4 --num_patches 4096 --wsi_projection_dim 256
+    
+###1-31
+# coattn  MCAT
+DATA_ROOT_DIR='/hpc2hdd/JH_DATA/share/yangwu/yangwu_yangwu_ALL_projects/TCGA_data/DATA_ROOT_DIR' 
+BASE_DIR="/hpc2hdd/home/yangwu/WY/SurvPath" 
+STUDY="brca" 
+TYPE_OF_PATH="combine"
+MODEL="coattn"
+CUDA_VISIBLE_DEVICES=0 python main.py \
+    --study tcga_${STUDY} --task survival --split_dir splits --which_splits 5foldcv \
+    --type_of_path $TYPE_OF_PATH --modality $MODEL --data_root_dir $DATA_ROOT_DIR --label_file datasets_csv/metadata_all_endpoints/tcga_${STUDY}.csv \
+    --omics_dir datasets_csv/raw_rna_data/${TYPE_OF_PATH}/${STUDY} --results_dir "results_brca_check" \
+    --batch_size 1 --lr 0.0005 --opt radam --reg 0.0001 \
+    --alpha_surv 0.5 --weighted_sample --max_epochs 5 --encoding_dim 768 \
+    --label_col survival_months_dss --k 5 --bag_loss nll_surv --n_classes 4 --num_patches 4096 --wsi_projection_dim 256
+
+####--results_dir "results_brca_check"
+###snn
+DATA_ROOT_DIR='/hpc2hdd/home/yangwu/WY/TCGA_data/DATA_ROOT_DIR' 
+BASE_DIR="/hpc2hdd/home/yangwu/WY/SurvPath" 
+STUDY="brca" 
+TYPE_OF_PATH="combine"
+MODEL="snn" 
+CUDA_VISIBLE_DEVICES=0 python main.py \
+    --study tcga_${STUDY} --task survival --split_dir splits --which_splits 5foldcv \
+    --type_of_path $TYPE_OF_PATH --modality $MODEL --data_root_dir $DATA_ROOT_DIR --label_file datasets_csv/metadata_all_endpoints/tcga_${STUDY}.csv \
+    --omics_dir datasets_csv/raw_rna_data/${TYPE_OF_PATH}/${STUDY} --results_dir "results_brca_check" \
+    --batch_size 1 --lr 0.0005 --opt radam --reg 0.0001 \
+    --alpha_surv 0.5 --weighted_sample --max_epochs 5 \
+    --label_col survival_months_dss --k 5 --bag_loss nll_surv --n_classes 4 --num_patches 4096 --wsi_projection_dim 256
+
+#### "mlp_per_path"   ###  
+DATA_ROOT_DIR='/hpc2hdd/home/yangwu/WY/TCGA_data/DATA_ROOT_DIR' 
+BASE_DIR="/hpc2hdd/home/yangwu/WY/SurvPath" 
+STUDY="brca" 
+TYPE_OF_PATH="combine"
+MODEL="mlp_per_path"
+CUDA_VISIBLE_DEVICES=0 python main.py \
+    --study tcga_${STUDY} --task survival --split_dir splits --which_splits 5foldcv \
+    --type_of_path $TYPE_OF_PATH --modality $MODEL --data_root_dir $DATA_ROOT_DIR --label_file datasets_csv/metadata_all_endpoints/tcga_${STUDY}.csv \
+    --omics_dir datasets_csv/raw_rna_data/${TYPE_OF_PATH}/${STUDY} --results_dir "results_brca_check" \
+    --batch_size 1 --lr 0.0005 --opt radam --reg 0.0001 \
+    --alpha_surv 0.5 --weighted_sample --max_epochs 5 \
+    --label_col survival_months_dss --k 5 --bag_loss nll_surv --n_classes 4 --num_patches 4096 --wsi_projection_dim 256
+    
+    
+### survpath  model  survpath  ny
+DATA_ROOT_DIR='/hpc2hdd/home/yangwu/WY/TCGA_data/DATA_ROOT_DIR' 
+BASE_DIR="/hpc2hdd/home/yangwu/WY/SurvPath" 
+STUDY="brca" 
+TYPE_OF_PATH="combine" 
+MODEL="survpath" 
+CUDA_VISIBLE_DEVICES=0 python main.py \
+    --study tcga_${STUDY} --task survival --split_dir splits --which_splits 5foldcv \
+    --type_of_path $TYPE_OF_PATH --modality $MODEL --data_root_dir $DATA_ROOT_DIR --label_file datasets_csv/metadata_all_endpoints/tcga_${STUDY}.csv \
+    --omics_dir datasets_csv/raw_rna_data/${TYPE_OF_PATH}/${STUDY} --results_dir "results_brca_check" \
+    --batch_size 1 --lr 0.0005 --opt radam --reg 0.0001 \
+    --alpha_surv 0.5 --weighted_sample --max_epochs 5 --encoding_dim 768 \
+    --label_col survival_months_dss --k 5 --bag_loss nll_surv --n_classes 4 --num_patches 4096 --wsi_projection_dim 256
+###process_args ：
+
+
+### 2.26  
+### survpath  model  survpath  ny
+DATA_ROOT_DIR='/hpc2hdd/home/yangwu/WY/im4MEC/feature_bags_ctp/' 
+BASE_DIR="/hpc2hdd/home/yangwu/WY/SurvPath" 
+STUDY="lihc" 
+MODEL="survpath" 
+CUDA_VISIBLE_DEVICES=0 python main-rad.py \
+    --study tcga_${STUDY} --task survival --split_dir splits --which_splits 5foldcv \
+    --modality $MODEL --data_root_dir $DATA_ROOT_DIR --label_file datasets_csv/metadata_all_endpoints/tcga_${STUDY}.csv \
+    --rad_data_dir '/hpc2hdd/home/yangwu/WY/dl-mri/rad_features.h5' \
+    --results_dir "results_LIHC" \
+    --batch_size 1 --lr 0.0005 --opt radam --reg 0.0001 \
+    --alpha_surv 0.5 --weighted_sample --max_epochs 5 --encoding_dim 768 \
+    --label_col survival_months --k 5 --bag_loss nll_surv --n_classes 4 --num_patches 4096 --wsi_projection_dim 256
+
+#### 3.1 data_root_dir
+DATA_ROOT_DIR='/hpc2hdd/home/yangwu/WY/im4MEC/feature_bags_ctp_128/' 
+BASE_DIR="/hpc2hdd/home/yangwu/WY/SurvPath" 
+STUDY="lihc" 
+MODEL="survpath" 
+CUDA_VISIBLE_DEVICES=0 python main-rad.py \
+    --study tcga_${STUDY} --task survival --split_dir splits --which_splits 5foldcv \
+    --modality $MODEL --data_root_dir $DATA_ROOT_DIR --label_file datasets_csv/metadata_all_endpoints/tcga_${STUDY}.csv \
+    --rad_data_dir '/hpc2hdd/home/yangwu/WY/dl-mri/rad_features.h5' \
+    --results_dir "results_LIHC_3.1" \
+    --batch_size 1 --lr 0.0005 --opt radam --reg 0.0001 \
+    --alpha_surv 0.5 --weighted_sample --max_epochs 10 --encoding_dim 768 \
+    --label_col survival_months --k 5 --bag_loss nll_surv --n_classes 4 --num_patches 4096 --wsi_projection_dim 256
+
+
+### 3.4 label
+DATA_ROOT_DIR='/hpc2hdd/home/yangwu/WY/im4MEC/feature_bags_ctp_128/' 
+BASE_DIR="/hpc2hdd/home/yangwu/WY/SurvPath" 
+STUDY="lihc" 
+MODEL="survpath" 
+CUDA_VISIBLE_DEVICES=0 python main-rad_fufa.py \
+    --study tcga_${STUDY} --task survival --split_dir splits --which_splits 5foldcv \
+    --modality $MODEL --data_root_dir $DATA_ROOT_DIR --label_file datasets_csv/metadata_all_endpoints/tcga_${STUDY}.csv \
+    --rad_data_dir '/hpc2hdd/home/yangwu/WY/dl-mri/rad_features.h5' \
+    --results_dir "results_LIHC_3.4" \
+    --batch_size 1 --lr 0.0005 --opt radam --reg 0.0001 \
+    --alpha_surv 0.5 --weighted_sample --max_epochs 10 --encoding_dim 768 \
+    --label_col class_label --k 5 --bag_loss bce_logits --n_classes 2 --num_patches 4096 --wsi_projection_dim 256
+
+test ？
+
+####550caseCV
+DATA_ROOT_DIR='/hpc2hdd/home/yangwu/WY/im4MEC/feature_bags_ctp_128/' 
+BASE_DIR="/hpc2hdd/home/yangwu/WY/SurvPath" 
+STUDY="lihc" 
+MODEL="survpath" 
+CUDA_VISIBLE_DEVICES=0 python main-rad_fufa.py \
+    --study tcga_${STUDY} --task survival --split_dir splits --which_splits 550_5fold \
+    --modality $MODEL --data_root_dir $DATA_ROOT_DIR --label_file datasets_csv/metadata_all_endpoints/tcga_${STUDY}.csv \
+    --rad_data_dir '/hpc2hdd/home/yangwu/WY/dl-mri/rad_features.h5' \
+    --results_dir "results_LIHC_550ALL" \
+    --batch_size 1 --lr 0.0005 --opt radam --reg 0.0001 \
+    --alpha_surv 0.5 --weighted_sample --max_epochs 5 --encoding_dim 768 \
+    --label_col class_label --k 5 --bag_loss bce_logits --n_classes 2 --num_patches 4096 --wsi_projection_dim 256
+###  num_patches=2048
+DATA_ROOT_DIR='/hpc2hdd/home/yangwu/WY/im4MEC/feature_bags_ctp_128/' 
+BASE_DIR="/hpc2hdd/home/yangwu/WY/SurvPath" 
+STUDY="lihc" 
+MODEL="survpath" 
+CUDA_VISIBLE_DEVICES=0 python main-rad_fufa.py \
+    --study tcga_${STUDY} --task survival --split_dir splits --which_splits 550_5fold \
+    --modality $MODEL --data_root_dir $DATA_ROOT_DIR --label_file datasets_csv/metadata_all_endpoints/tcga_${STUDY}.csv \
+    --rad_data_dir '/hpc2hdd/home/yangwu/WY/dl-mri/rad_features.h5' \
+    --results_dir "results_LIHC_550ALL" \
+    --batch_size 1 --lr 0.0005 --opt radam --reg 0.0001 \
+    --alpha_surv 0.5 --weighted_sample --max_epochs 5 --encoding_dim 768 \
+    --label_col class_label --k 5 --bag_loss bce_logits --n_classes 2 --num_patches 2048 --wsi_projection_dim 256
+
+
+#### ctp_360
+DATA_ROOT_DIR='/hpc2hdd/home/yangwu/WY/im4MEC/feature_bags_ctp/' 
+BASE_DIR="/hpc2hdd/home/yangwu/WY/SurvPath" 
+STUDY="lihc" 
+MODEL="survpath" 
+CUDA_VISIBLE_DEVICES=0 python main-rad_fufa.py \
+    --study tcga_${STUDY} --task survival --split_dir splits --which_splits 550_5fold \
+    --modality $MODEL --data_root_dir $DATA_ROOT_DIR --label_file datasets_csv/metadata_all_endpoints/tcga_${STUDY}.csv \
+    --rad_data_dir '/hpc2hdd/home/yangwu/WY/dl-mri/rad_features.h5' \
+    --results_dir "results_LIHC_360" \
+    --batch_size 1 --lr 0.0005 --opt radam --reg 0.0001 \
+    --alpha_surv 0.5 --weighted_sample --max_epochs 5 --encoding_dim 768 \
+    --label_col class_label --k 5 --bag_loss bce_logits --n_classes 2 --num_patches 4096 --wsi_projection_dim 256
+
+### 3.6 clinical_data
+DATA_ROOT_DIR='/hpc2hdd/home/yangwu/WY/im4MEC/feature_bags_ctp_128/' 
+BASE_DIR="/hpc2hdd/home/yangwu/WY/SurvPath" 
+STUDY="lihc" 
+MODEL="survpath" 
+CUDA_VISIBLE_DEVICES=0 python main-rad_fufa.py \
+    --study tcga_${STUDY} --task survival --split_dir splits --which_splits 550_5fold \
+    --modality $MODEL --data_root_dir $DATA_ROOT_DIR --label_file datasets_csv/metadata_all_endpoints/tcga_${STUDY}.csv \
+    --rad_data_dir '/hpc2hdd/home/yangwu/WY/dl-mri/rad_features.h5' \
+    --results_dir "results_LIHC_550ALL_CLI" \
+    --batch_size 1 --lr 0.0005 --opt radam --reg 0.0001 \
+    --alpha_surv 0.5 --weighted_sample --max_epochs 10 --encoding_dim 768 \
+    --label_col class_label --k 5 --bag_loss bce_logits --n_classes 2 --num_patches 2048 --wsi_projection_dim 256
+
+DATA_ROOT_DIR='/hpc2hdd/home/yangwu/WY/im4MEC/feature_bags_ctp_128/' 
+BASE_DIR="/hpc2hdd/home/yangwu/WY/SurvPath" 
+STUDY="lihc" 
+MODEL="survpath" 
+CUDA_VISIBLE_DEVICES=0 python main-rad_fufa.py \
+    --study tcga_${STUDY} --task survival --split_dir splits --which_splits 550_5fold \
+    --modality $MODEL --data_root_dir $DATA_ROOT_DIR --label_file datasets_csv/metadata_all_endpoints/tcga_${STUDY}.csv \
+    --rad_data_dir '/hpc2hdd/home/yangwu/WY/dl-mri/rad_features.h5' \
+    --results_dir "results_LIHC_3.12_cli" \
+    --batch_size 1 --lr 0.0005 --opt adam --reg 0.0001 \
+    --alpha_surv 0.5 --weighted_sample --max_epochs 10 --encoding_dim 768 \
+    --label_col class_label --k 5 --bag_loss bce_logits --n_classes 2 --num_patches 2048 --wsi_projection_dim 256
+
+### 3.12rad_features.h5
+DATA_ROOT_DIR='/hpc2hdd/home/yangwu/WY/im4MEC/feature_bags_ctp_128/' 
+BASE_DIR="/hpc2hdd/home/yangwu/WY/SurvPath" 
+STUDY="lihc" 
+MODEL="survpath" 
+CUDA_VISIBLE_DEVICES=0 python main-rad_fufa.py \
+    --study tcga_${STUDY} --task survival --split_dir splits --which_splits 550_5fold \
+    --modality $MODEL --data_root_dir $DATA_ROOT_DIR --label_file datasets_csv/metadata_all_endpoints/tcga_${STUDY}.csv \
+    --rad_data_dir '/hpc2hdd/home/yangwu/WY/dl-mri/rad_features.h5' \
+    --results_dir "results_3.13_550CV_wsi+rad" \
+    --batch_size 1 --lr 0.0005 --opt radam --reg 0.0001 \
+    --alpha_surv 0.5 --weighted_sample --max_epochs 10 --encoding_dim 768 \
+    --label_col class_label --k 5 --bag_loss bce_logits --n_classes 2 --num_patches 2048 --wsi_projection_dim 256
+
+    
+
+### MR_img+VIT
+DATA_ROOT_DIR='/hpc2hdd/home/yangwu/WY/im4MEC/feature_bags_ctp_128/' 
+BASE_DIR="/hpc2hdd/home/yangwu/WY/SurvPath" 
+STUDY="lihc" 
+MODEL="survpath" 
+CUDA_VISIBLE_DEVICES=0 python main-rad_test.py \
+    --study tcga_${STUDY} --task survival --split_dir splits --which_splits 550_5fold \
+    --modality $MODEL --data_root_dir $DATA_ROOT_DIR --label_file datasets_csv/metadata_all_endpoints/tcga_${STUDY}.csv \
+    --rad_data_dir '/hpc2hdd/home/yangwu/WY/dl-mri/output/' \
+    --results_dir "results_3.31_test" \
+    --batch_size 1 --lr 0.0005 --opt radam --reg 0.0001 \
+    --alpha_surv 0.5 --weighted_sample --max_epochs 10 --encoding_dim 768 \
+    --label_col class_label --k 5 --bag_loss cross_entropy --n_classes 2 --num_patches 2048 --wsi_projection_dim 256
+
+### 3.20 
+CUDA_VISIBLE_DEVICES=0 python main-rad_test.py \
+    --study tcga_${STUDY} --task survival --split_dir splits --which_splits 550_5fold \
+    --modality $MODEL --data_root_dir $DATA_ROOT_DIR --label_file datasets_csv/metadata_all_endpoints/tcga_${STUDY}.csv \
+    --rad_data_dir '/hpc2hdd/home/yangwu/WY/dl-mri/output/' \
+    --results_dir "results_3.19_test" \
+    --batch_size 1 --lr 0.0002 --opt radam --reg 0.0001 \
+    --alpha_surv 0.5 --weighted_sample --max_epochs 20 --encoding_dim 768 \
+    --label_col class_label --k 5 --bag_loss bce_logits --n_classes 2 --num_patches 2048 --wsi_projection_dim 256
+
+## lr 0.0001
+CUDA_VISIBLE_DEVICES=0 python main-rad_test.py \
+    --study tcga_${STUDY} --task survival --split_dir splits --which_splits 550_5fold \
+    --modality $MODEL --data_root_dir $DATA_ROOT_DIR --label_file datasets_csv/metadata_all_endpoints/tcga_${STUDY}.csv \
+    --rad_data_dir '/hpc2hdd/home/yangwu/WY/dl-mri/output/' \
+    --results_dir "results_3.19_test" \
+    --batch_size 1 --lr 0.0001 --opt radam --reg 0.0001 \
+    --alpha_surv 0.5 --weighted_sample --max_epochs 20 --encoding_dim 768 \
+    --label_col class_label --k 5 --bag_loss bce_logits --n_classes 2 --num_patches 2048 --wsi_projection_dim 256
+###clinical——feature
+CUDA_VISIBLE_DEVICES=0 python main-rad_test.py \
+    --study tcga_${STUDY} --task survival --split_dir splits --which_splits 550_5fold \
+    --modality $MODEL --data_root_dir $DATA_ROOT_DIR --label_file datasets_csv/metadata_all_endpoints/tcga_${STUDY}.csv \
+    --rad_data_dir '/hpc2hdd/home/yangwu/WY/dl-mri/output/' \
+    --results_dir "results_3.20_C+R+P" \
+    --batch_size 1 --lr 0.0001 --opt radam --reg 0.0001 \
+    --alpha_surv 0.5 --weighted_sample --max_epochs 20 --encoding_dim 768 \
+    --label_col class_label --k 5 --bag_loss bce_logits --n_classes 2 --num_patches 2048 --wsi_projection_dim 256
+terminal
+DATA_ROOT_DIR='/hpc2hdd/home/yangwu/WY/im4MEC/feature_bags_ctp_128/' 
+BASE_DIR="/hpc2hdd/home/yangwu/WY/SurvPath" 
+STUDY="lihc" 
+MODEL="survpath" 
+CUDA_VISIBLE_DEVICES=0 python main-rad_test.py \
+    --study tcga_${STUDY} --task survival --split_dir splits --which_splits 550_5fold \
+    --modality $MODEL --data_root_dir $DATA_ROOT_DIR --label_file datasets_csv/metadata_all_endpoints/tcga_${STUDY}.csv \
+    --rad_data_dir '/hpc2hdd/home/yangwu/WY/dl-mri/output/' \
+    --results_dir "results_3.20_C+R+P" \
+    --batch_size 1 --lr 0.00005 --opt radam --reg 0.0001 \
+    --alpha_surv 0.5 --weighted_sample --max_epochs 20 --encoding_dim 768 \
+    --label_col class_label --k 5 --bag_loss bce_logits --n_classes 2 --num_patches 2048 --wsi_projection_dim 256
+
+CUDA_VISIBLE_DEVICES=0 python main-rad_test.py \
+    --study tcga_${STUDY} --task survival --split_dir splits --which_splits 550_5fold \
+    --modality $MODEL --data_root_dir $DATA_ROOT_DIR --label_file datasets_csv/metadata_all_endpoints/tcga_${STUDY}.csv \
+    --rad_data_dir '/hpc2hdd/home/yangwu/WY/dl-mri/output/' \
+    --results_dir "results_3.20_C+R+P" \
+    --batch_size 1 --lr 0.00001 --opt radam --reg 0.0001 \
+    --alpha_surv 0.5 --weighted_sample --max_epochs 20 --encoding_dim 768 \
+    --label_col class_label --k 5 --bag_loss bce_logits --n_classes 2 --num_patches 2048 --wsi_projection_dim 256
+3.21
+CUDA_VISIBLE_DEVICES=0 python main-rad_test.py \
+    --study tcga_${STUDY} --task survival --split_dir splits --which_splits 550_5fold \
+    --modality $MODEL --data_root_dir $DATA_ROOT_DIR --label_file datasets_csv/metadata_all_endpoints/tcga_${STUDY}.csv \
+    --rad_data_dir '/hpc2hdd/home/yangwu/WY/dl-mri/output/' \
+    --results_dir "results_3.21_C+R+P" \
+    --batch_size 1 --lr 0.000005 --opt radam --reg 0.0001 \
+    --weighted_sample --max_epochs 20 --encoding_dim 768 \
+    --label_col class_label --k 5 --bag_loss bce_logits --n_classes 2 --num_patches 2048 --wsi_projection_dim 256
+
+CUDA_VISIBLE_DEVICES=0 python main-rad_test.py \
+    --study tcga_${STUDY} --task survival --split_dir splits --which_splits 550_5fold \
+    --modality $MODEL --data_root_dir $DATA_ROOT_DIR --label_file datasets_csv/metadata_all_endpoints/tcga_${STUDY}.csv \
+    --rad_data_dir '/hpc2hdd/home/yangwu/WY/dl-mri/output/' \
+    --results_dir "results_3.21_C+R+P" \
+    --batch_size 1 --lr 0.000001 --opt radam --reg 0.0001 \
+    --weighted_sample --max_epochs 50 --encoding_dim 768 \
+    --label_col class_label --k 5 --bag_loss bce_logits --n_classes 2 --num_patches 2048 --wsi_projection_dim 256
+--lr
+CUDA_VISIBLE_DEVICES=0 python main-rad_test.py \
+    --study tcga_${STUDY} --task survival --split_dir splits --which_splits 550_5fold \
+    --modality $MODEL --data_root_dir $DATA_ROOT_DIR --label_file datasets_csv/metadata_all_endpoints/tcga_${STUDY}.csv \
+    --rad_data_dir '/hpc2hdd/home/yangwu/WY/dl-mri/output/' \
+    --results_dir "results_3.21_C+R+P" \
+    --batch_size 1 --lr 0.000002 --opt radam --reg 0.0001 \
+    --weighted_sample --max_epochs 20 --encoding_dim 768 \
+    --label_col class_label --k 5 --bag_loss bce_logits --n_classes 2 --num_patches 2048 --wsi_projection_dim 256
+
+CUDA_VISIBLE_DEVICES=0 python main-rad_test.py \
+    --study tcga_${STUDY} --task survival --split_dir splits --which_splits 550_5fold \
+    --modality $MODEL --data_root_dir $DATA_ROOT_DIR --label_file datasets_csv/metadata_all_endpoints/tcga_${STUDY}.csv \
+    --rad_data_dir '/hpc2hdd/home/yangwu/WY/dl-mri/output/' \
+    --results_dir "results_3.21_C+R+P" \
+    --batch_size 1 --lr 0.000002 --opt adam --reg 0.0001 \
+    --weighted_sample --max_epochs 20 --encoding_dim 768 \
+    --label_col class_label --k 5 --bag_loss bce_logits --n_classes 2 --num_patches 2048 --wsi_projection_dim 256
+
+3/22
+DATA_ROOT_DIR='/hpc2hdd/home/yangwu/WY/im4MEC/feature_bags_ctp_128/' 
+BASE_DIR="/hpc2hdd/home/yangwu/WY/SurvPath" 
+STUDY="lihc" 
+MODEL="survpath" 
+CUDA_VISIBLE_DEVICES=0 python main-rad_test.py \
+    --study tcga_${STUDY} --task survival --split_dir splits --which_splits 550_5fold \
+    --modality $MODEL --data_root_dir $DATA_ROOT_DIR --label_file datasets_csv/metadata_all_endpoints/tcga_${STUDY}.csv \
+    --rad_data_dir '/hpc2hdd/home/yangwu/WY/dl-mri/output/' \
+    --results_dir "results_3.31_test" \
+    --batch_size 1 --lr 0.000001 --opt radam --reg 0.0001 \
+    --weighted_sample --max_epochs 10 --encoding_dim 768 \
+    --label_col class_label --k 5 --bag_loss cross_entropy --n_classes 2 --num_patches 4096 --wsi_projection_dim 
+    
+CUDA_VISIBLE_DEVICES=0 python main-rad_test.py \
+    --study tcga_${STUDY} --task survival --split_dir splits --which_splits 550_5fold \
+    --modality $MODEL --data_root_dir $DATA_ROOT_DIR --label_file datasets_csv/metadata_all_endpoints/tcga_${STUDY}.csv \
+    --rad_data_dir '/hpc2hdd/home/yangwu/WY/dl-mri/output/' \
+    --results_dir "results_3.22_C+R+P_radam" \
+    --batch_size 1 --lr 0.000002 --opt radam --reg 0.0001 \
+    --weighted_sample --max_epochs 20 --encoding_dim 768 \
+    --label_col class_label --k 5 --bag_loss bce_logits --n_classes 2 --num_patches 4096 --wsi_projection_dim 256
+
+DATA_ROOT_DIR='/hpc2hdd/home/yangwu/WY/im4MEC/feature_bags_ctp/' 
+BASE_DIR="/hpc2hdd/home/yangwu/WY/SurvPath" 
+STUDY="lihc" 
+MODEL="survpath"
+CUDA_VISIBLE_DEVICES=0 python main-rad_test.py \
+    --study tcga_${STUDY} --task survival --split_dir splits --which_splits 550_5fold \
+    --modality $MODEL --data_root_dir $DATA_ROOT_DIR --label_file datasets_csv/metadata_all_endpoints/tcga_${STUDY}.csv \
+    --rad_data_dir '/hpc2hdd/home/yangwu/WY/dl-mri/output/' \
+    --results_dir "results_3.22_C+R+P" \
+    --batch_size 1 --lr 0.000002 --opt adam --reg 0.0001 \
+    --weighted_sample --max_epochs 20 --encoding_dim 768 \
+    --label_col class_label --k 5 --bag_loss bce_logits --n_classes 2 --num_patches 2048 --wsi_projection_dim 256
+3.24
+DATA_ROOT_DIR='/hpc2hdd/home/yangwu/WY/im4MEC/feature_bags_phikon/' 
+BASE_DIR="/hpc2hdd/home/yangwu/WY/SurvPath" 
+STUDY="lihc" 
+MODEL="survpath"
+CUDA_VISIBLE_DEVICES=0 python main-rad_test.py \
+    --study tcga_${STUDY} --task survival --split_dir splits --which_splits 550_5fold \
+    --modality $MODEL --data_root_dir $DATA_ROOT_DIR --label_file datasets_csv/metadata_all_endpoints/tcga_${STUDY}.csv \
+    --rad_data_dir '/hpc2hdd/home/yangwu/WY/dl-mri/output/' \
+    --results_dir "results_3.24_phikon" \
+    --batch_size 1 --lr 0.000002 --opt adam --reg 0.0001 \
+    --weighted_sample --max_epochs 20 --encoding_dim 768 \
+    --label_col class_label --k 5 --bag_loss bce_logits --n_classes 2 --num_patches 8096 --wsi_projection_dim 256
+
+DATA_ROOT_DIR='/hpc2hdd/home/yangwu/WY/im4MEC/feature_bags_ctp_128/' 
+BASE_DIR="/hpc2hdd/home/yangwu/WY/SurvPath" 
+STUDY="lihc" 
+MODEL="survpath"
+CUDA_VISIBLE_DEVICES=0 python main-rad_test.py \
+    --study tcga_${STUDY} --task survival --split_dir splits --which_splits 550_5fold \
+    --modality $MODEL --data_root_dir $DATA_ROOT_DIR --label_file datasets_csv/metadata_all_endpoints/tcga_${STUDY}.csv \
+    --rad_data_dir '/hpc2hdd/home/yangwu/WY/dl-mri/output/' \
+    --results_dir "results_3.31_test" \
+    --batch_size 1 --lr 0.00002 --opt radam --reg 0.0001 \
+    --weighted_sample --max_epochs 20 --encoding_dim 768 \
+    --label_col class_label --k 5 --bag_loss cross_entropy --n_classes 2 --num_patches 4096  --wsi_projection_dim 256
+
+
+##### 3.28 ####
+DATA_ROOT_DIR='/hpc2hdd/home/yangwu/WY/im4MEC/feature_bags_UNI_256um/' 
+BASE_DIR="/hpc2hdd/home/yangwu/WY/SurvPath" 
+STUDY="lihc" 
+MODEL="survpath"
+CUDA_VISIBLE_DEVICES=0 python main-rad_test.py \
+    --study tcga_${STUDY} --task survival --split_dir splits --which_splits 550_5fold \
+    --modality $MODEL --data_root_dir $DATA_ROOT_DIR --label_file datasets_csv/metadata_all_endpoints/tcga_${STUDY}.csv \
+    --rad_data_dir '/hpc2hdd/home/yangwu/WY/dl-mri/output/' \
+    --results_dir "results_3.28_UNI" \
+    --batch_size 1 --lr 0.000002 --opt radam --reg 0.0001 \
+    --weighted_sample --max_epochs 20 --encoding_dim 1024 \
+    --label_col class_label --k 5 --bag_loss bce_logits --n_classes 2 --num_patches 4096  --wsi_projection_dim 
+    
+DATA_ROOT_DIR='/hpc2hdd/home/yangwu/WY/im4MEC/feature_bags_UNI_256um/' 
+BASE_DIR="/hpc2hdd/home/yangwu/WY/SurvPath" 
+STUDY="lihc" 
+MODEL="survpath"
+CUDA_VISIBLE_DEVICES=0 python main-rad_test.py \
+    --study tcga_${STUDY} --task survival --split_dir splits --which_splits 550_5fold \
+    --modality $MODEL --data_root_dir $DATA_ROOT_DIR --label_file datasets_csv/metadata_all_endpoints/tcga_${STUDY}.csv \
+    --rad_data_dir '/hpc2hdd/home/yangwu/WY/dl-mri/output/' \
+    --results_dir "results_3.28_UNI" \
+    --batch_size 1 --lr 0.000002 --opt radam --reg 0.0001 \
+    --weighted_sample --max_epochs 20 --encoding_dim 1024 \
+    --label_col class_label --k 5 --bag_loss bce_logits --n_classes 2 --num_patches 4096  --wsi_projection_dim 256
+
+DATA_ROOT_DIR='/hpc2hdd/home/yangwu/WY/im4MEC/feature_bags_UNI_256um/' 
+BASE_DIR="/hpc2hdd/home/yangwu/WY/SurvPath" 
+STUDY="lihc" 
+MODEL="survpath"
+CUDA_VISIBLE_DEVICES=0 python main-rad_test.py \
+    --study tcga_${STUDY} --task survival --split_dir splits --which_splits 550_5fold \
+    --modality $MODEL --data_root_dir $DATA_ROOT_DIR --label_file datasets_csv/metadata_all_endpoints/tcga_${STUDY}.csv \
+    --rad_data_dir '/hpc2hdd/home/yangwu/WY/dl-mri/output/' \
+    --results_dir "results_3.28_UNI" \
+    --batch_size 1 --lr 0.000002 --opt radam --reg 0.0001 \
+    --weighted_sample --max_epochs 20 --encoding_dim 1024 \
+    --label_col class_label --k 5 --bag_loss bce_logits --n_classes 2 --num_patches 2048  --wsi_projection_dim 256
+
+CUDA_VISIBLE_DEVICES=0 python main-rad_test.py \
+    --study tcga_${STUDY} --task survival --split_dir splits --which_splits 550_5fold \
+    --modality $MODEL --data_root_dir $DATA_ROOT_DIR --label_file datasets_csv/metadata_all_endpoints/tcga_${STUDY}.csv \
+    --rad_data_dir '/hpc2hdd/home/yangwu/WY/dl-mri/output/' \
+    --results_dir "results_3.28_UNI" \
+    --batch_size 1 --lr 0.000001 --opt radam --reg 0.0001 \
+    --weighted_sample --max_epochs 20 --encoding_dim 1024 \
+    --label_col class_label --k 5 --bag_loss bce_logits --n_classes 2 --num_patches 2048  --wsi_projection_dim 256
+
+CUDA_VISIBLE_DEVICES=0 python main-rad_test.py \
+    --study tcga_${STUDY} --task survival --split_dir splits --which_splits 550_5fold \
+    --modality $MODEL --data_root_dir $DATA_ROOT_DIR --label_file datasets_csv/metadata_all_endpoints/tcga_${STUDY}.csv \
+    --rad_data_dir '/hpc2hdd/home/yangwu/WY/dl-mri/output/' \
+    --results_dir "results_3.28_UNI" \
+    --batch_size 1 --lr 0.000002 --opt sgd --reg 0.0001 \
+    --weighted_sample --max_epochs 20 --encoding_dim 1024 \
+    --label_col class_label --k 5 --bag_loss bce_logits --n_classes 2 --num_patches 2048  --wsi_projection_dim 256
+
+CUDA_VISIBLE_DEVICES=0 python main-rad_test.py \
+    --study tcga_${STUDY} --task survival --split_dir splits --which_splits 550_5fold \
+    --modality $MODEL --data_root_dir $DATA_ROOT_DIR --label_file datasets_csv/metadata_all_endpoints/tcga_${STUDY}.csv \
+    --rad_data_dir '/hpc2hdd/home/yangwu/WY/dl-mri/output/' \
+    --results_dir "results_3.28_UNI" \
+    --batch_size 1 --lr 0.000002 --opt adam --reg 0.001 \
+    --weighted_sample --max_epochs 20 --encoding_dim 1024 \
+    --label_col class_label --k 5 --bag_loss bce_logits --n_classes 2 --num_patches 2048  --wsi_projection_dim 256
+
+CUDA_VISIBLE_DEVICES=0 python main-rad_test.py \
+    --study tcga_${STUDY} --task survival --split_dir splits --which_splits 550_5fold \
+    --modality $MODEL --data_root_dir $DATA_ROOT_DIR --label_file datasets_csv/metadata_all_endpoints/tcga_${STUDY}.csv \
+    --rad_data_dir '/hpc2hdd/home/yangwu/WY/dl-mri/output/' \
+    --results_dir "results_3.28_UNI——VIT_0.2" \
+    --batch_size 1 --lr 0.000002 --opt adam --reg 0.001 \
+    --weighted_sample --max_epochs 20 --encoding_dim 1024 \
+    --label_col class_label --k 5 --bag_loss bce_logits --n_classes 2 --num_patches 2048  --wsi_projection_dim 256
+
+CUDA_VISIBLE_DEVICES=0 python main-rad_test.py \
+--study tcga_${STUDY} --task survival --split_dir splits --which_splits 550_5fold \
+--modality $MODEL --data_root_dir $DATA_ROOT_DIR --label_file datasets_csv/metadata_all_endpoints/tcga_${STUDY}.csv \
+--rad_data_dir '/hpc2hdd/home/yangwu/WY/dl-mri/output/' \
+--results_dir "results_3.29_UNI" \
+--batch_size 1 --lr 0.000002 --opt adam --reg 0.001 \
+--weighted_sample --max_epochs 20 --encoding_dim 1024 \
+--label_col class_label --k 5 --bag_loss cross_entropy --n_classes 2 --num_patches 4096  --wsi_projection_dim 256
+
+3.29
+DATA_ROOT_DIR='/hpc2hdd/home/yangwu/WY/im4MEC/feature_bags_UNI_128um/' 
+BASE_DIR="/hpc2hdd/home/yangwu/WY/SurvPath" 
+STUDY="lihc" 
+MODEL="survpath"
+CUDA_VISIBLE_DEVICES=0 python main-rad_test.py \
+    --study tcga_${STUDY} --task survival --split_dir splits --which_splits 550_5fold \
+    --modality $MODEL --data_root_dir $DATA_ROOT_DIR --label_file datasets_csv/metadata_all_endpoints/tcga_${STUDY}.csv \
+    --rad_data_dir '/hpc2hdd/home/yangwu/WY/dl-mri/output/' \
+    --results_dir "results_4.1_UNI" \
+    --batch_size 1 --lr 0.000002 --opt radam --reg 0.0001 \
+    --weighted_sample --max_epochs 20 --encoding_dim 1024 \
+    --label_col class_label --k 5 --bag_loss cross_entropy --n_classes 2 --num_patches 4096  --wsi_projection_dim 256
+
+
+### 4.9
+DATA_ROOT_DIR='/hpc2hdd/home/yangwu/WY/im4MEC/feature_bags_UNI_256um/' 
+BASE_DIR="/hpc2hdd/home/yangwu/WY/SurvPath" 
+STUDY="lihc" 
+MODEL="survpath"
+CUDA_VISIBLE_DEVICES=0 python main-rad_test.py \
+    --study tcga_${STUDY} --task survival --split_dir splits --which_splits 550_5fold \
+    --modality $MODEL --data_root_dir $DATA_ROOT_DIR --label_file datasets_csv/metadata_all_endpoints/tcga_${STUDY}.csv \
+    --rad_data_dir '/hpc2hdd/home/yangwu/WY/dl-mri/output/' \
+    --results_dir "results_UNI_256_top9+9_weighted" \
+    --batch_size 1 --lr 0.000005 --opt radam --reg 0.0001 \
+    --weighted_sample --max_epochs 20 --encoding_dim 1024 \
+    --label_col class_label --k 5 --bag_loss cross_entropy --n_classes 2 --num_patches 2048  --wsi_projection_dim 256
+### 4.9
+DATA_ROOT_DIR='/hpc2hdd/home/yangwu/WY/im4MEC/feature_bags_UNI_128um/' 
+BASE_DIR="/hpc2hdd/home/yangwu/WY/SurvPath" 
+STUDY="lihc" 
+MODEL="survpath"
+CUDA_VISIBLE_DEVICES=0 python main-rad_test.py \
+    --study tcga_${STUDY} --task survival --split_dir splits --which_splits 550_5fold \
+    --modality $MODEL --data_root_dir $DATA_ROOT_DIR --label_file datasets_csv/metadata_all_endpoints/tcga_${STUDY}.csv \
+    --rad_data_dir '/hpc2hdd/home/yangwu/WY/dl-mri/output/' \
+    --results_dir "4.9_results_UNI_128" \
+    --batch_size 1 --lr 0.000002 --opt radam --reg 0.0001 \
+    --weighted_sample --max_epochs 20 --encoding_dim 1024 \
+    --label_col class_label --k 5 --bag_loss cross_entropy --n_classes 2 --num_patches 4096  --wsi_projection_dim 256
+
+DATA_ROOT_DIR='/hpc2hdd/home/yangwu/WY/im4MEC/feature_bags_ctp_360/' 
+BASE_DIR="/hpc2hdd/home/yangwu/WY/SurvPath" 
+STUDY="lihc" 
+MODEL="survpath"
+CUDA_VISIBLE_DEVICES=0 python main-rad_test.py \
+    --study tcga_${STUDY} --task survival --split_dir splits --which_splits 550_5fold \
+    --modality $MODEL --data_root_dir $DATA_ROOT_DIR --label_file datasets_csv/metadata_all_endpoints/tcga_${STUDY}.csv \
+    --rad_data_dir '/hpc2hdd/home/yangwu/WY/dl-mri/output/' \
+    --results_dir "4.9_results_ctp_360" \
+    --batch_size 1 --lr 0.000005 --opt radam --reg 0.0001 \
+    --weighted_sample --max_epochs 10 --encoding_dim 768 \
+    --label_col class_label --k 5 --bag_loss cross_entropy --n_classes 2 --num_patches 1024  --wsi_projection_dim 256
+
+DATA_ROOT_DIR='/hpc2hdd/home/yangwu/WY/im4MEC/feature_bags_UNI_360um/' 
+BASE_DIR="/hpc2hdd/home/yangwu/WY/SurvPath" 
+STUDY="lihc" 
+MODEL="survpath"
+CUDA_VISIBLE_DEVICES=0 python main-rad_test.py \
+    --study tcga_${STUDY} --task survival --split_dir splits --which_splits 550_5fold \
+    --modality $MODEL --data_root_dir $DATA_ROOT_DIR --label_file datasets_csv/metadata_all_endpoints/tcga_${STUDY}.csv \
+    --rad_data_dir '/hpc2hdd/home/yangwu/WY/dl-mri/output/' \
+    --results_dir "4.9_results_UNI_360" \
+    --batch_size 1 --lr 0.000002 --opt radam --reg 0.0001 \
+    --weighted_sample --max_epochs 20 --encoding_dim 1024 \
+    --label_col class_label --k 5 --bag_loss cross_entropy --n_classes 2 --num_patches 2048  --wsi_projection_dim 256
+
+
+DATA_ROOT_DIR='/hpc2hdd/home/yangwu/WY/im4MEC/feature_bags_UNI_256um/' 
+BASE_DIR="/hpc2hdd/home/yangwu/WY/SurvPath" 
+STUDY="lihc" 
+MODEL="survpath"
+CUDA_VISIBLE_DEVICES=0 python main-rad_test.py \
+    --study tcga_${STUDY} --task survival --split_dir splits --which_splits 545_5fold \
+    --modality $MODEL --data_root_dir $DATA_ROOT_DIR --label_file datasets_csv/metadata_all_endpoints/tcga_${STUDY}.csv \
+    --rad_data_dir '/hpc2hdd/home/yangwu/WY/dl-mri/output/' \
+    --results_dir "4.9_results_UNI_256_545" \
+    --batch_size 1 --lr 0.000002 --opt radam --reg 0.0001 \
+    --weighted_sample --max_epochs 20 --encoding_dim 1024 \
+    --label_col class_label --k 5 --bag_loss cross_entropy --n_classes 2 --num_patches 4096  --wsi_projection_dim 256
+
+DATA_ROOT_DIR='/hpc2hdd/home/yangwu/WY/im4MEC/feature_bags_UNI_256um/' 
+BASE_DIR="/hpc2hdd/home/yangwu/WY/SurvPath" 
+STUDY="lihc" 
+MODEL="survpath"
+CUDA_VISIBLE_DEVICES=0 python main-rad_final.py \
+    --study tcga_${STUDY} --task survival --split_dir splits --which_splits 550_5fold \
+    --modality $MODEL --data_root_dir $DATA_ROOT_DIR --label_file datasets_csv/metadata_all_endpoints/tcga_${STUDY}.csv \
+    --rad_data_dir '/hpc2hdd/home/yangwu/WY/dl-mri/output/' \
+    --results_dir "4.9_results_UNI_256_9+9_weighted" \
+    --batch_size 1 --lr 0.000005 --opt radam --reg 0.0001 \
+    --weighted_sample --max_epochs 10 --encoding_dim 1024 \
+    --label_col class_label --k 5 --bag_loss cross_entropy --n_classes 2 --num_patches 2048  --wsi_projection_dim 256
+### 4.10
+DATA_ROOT_DIR='/hpc2hdd/home/yangwu/WY/im4MEC/feature_bags_UNI_128um/' 
+BASE_DIR="/hpc2hdd/home/yangwu/WY/SurvPath" 
+STUDY="lihc" 
+MODEL="survpath"
+CUDA_VISIBLE_DEVICES=0 python main-rad_test.py \
+    --study tcga_${STUDY} --task survival --split_dir splits --which_splits 550_5fold \
+    --modality $MODEL --data_root_dir $DATA_ROOT_DIR --label_file datasets_csv/metadata_all_endpoints/tcga_${STUDY}.csv \
+    --rad_data_dir '/hpc2hdd/home/yangwu/WY/dl-mri/output/' \
+    --results_dir "4.10_results_UNI_128" \
+    --batch_size 1 --lr 0.000002 --opt adam --reg 0.0001 \
+    --weighted_sample --max_epochs 20 --encoding_dim 1024 \
+    --label_col class_label --k 5 --bag_loss cross_entropy --n_classes 2 --num_patches 4096  --wsi_projection_dim 256
+
+DATA_ROOT_DIR='/hpc2hdd/home/yangwu/WY/im4MEC/feature_bags_UNI_128um/' 
+BASE_DIR="/hpc2hdd/home/yangwu/WY/SurvPath" 
+STUDY="lihc" 
+MODEL="survpath"
+CUDA_VISIBLE_DEVICES=0 python main-rad_test.py \
+    --study tcga_${STUDY} --task survival --split_dir splits --which_splits 550_5fold \
+    --modality $MODEL --data_root_dir $DATA_ROOT_DIR --label_file datasets_csv/metadata_all_endpoints/tcga_${STUDY}.csv \
+    --rad_data_dir '/hpc2hdd/home/yangwu/WY/dl-mri/output/' \
+    --results_dir "4.10_results_UNI_128" \
+    --batch_size 1 --lr 0.000005 --opt adam --reg 0.0001 \
+    --weighted_sample --max_epochs 10 --encoding_dim 1024 \
+    --label_col class_label --k 5 --bag_loss cross_entropy --n_classes 2 --num_patches 4096  --wsi_projection_dim 256
+
+DATA_ROOT_DIR='/hpc2hdd/home/yangwu/WY/im4MEC/feature_bags_UNI_256um/' 
+BASE_DIR="/hpc2hdd/home/yangwu/WY/SurvPath" 
+STUDY="lihc" 
+MODEL="survpath"
+CUDA_VISIBLE_DEVICES=0 python main-rad_test.py \
+    --study tcga_${STUDY} --task survival --split_dir splits --which_splits 550_5fold \
+    --modality $MODEL --data_root_dir $DATA_ROOT_DIR --label_file datasets_csv/metadata_all_endpoints/tcga_${STUDY}.csv \
+    --rad_data_dir '/hpc2hdd/home/yangwu/WY/dl-mri/output/' \
+    --results_dir "4.10_results_UNI_256_adam" \
+    --batch_size 1 --lr 0.000002 --opt adam --reg 0.0001 \
+    --weighted_sample --max_epochs 20 --encoding_dim 1024 \
+    --label_col class_label --k 5 --bag_loss cross_entropy --n_classes 2 --num_patches 4096  --wsi_projection_dim 256
+    
+DATA_ROOT_DIR='/hpc2hdd/home/yangwu/WY/im4MEC/feature_bags_UNI_256um/' 
+BASE_DIR="/hpc2hdd/home/yangwu/WY/SurvPath" 
+STUDY="lihc" 
+MODEL="survpath"
+CUDA_VISIBLE_DEVICES=0 python main-rad_test.py \
+    --study tcga_${STUDY} --task survival --split_dir splits --which_splits 550_5fold \
+    --modality $MODEL --data_root_dir $DATA_ROOT_DIR --label_file datasets_csv/metadata_all_endpoints/tcga_${STUDY}.csv \
+    --rad_data_dir '/hpc2hdd/home/yangwu/WY/dl-mri/output/' \
+    --results_dir "4.10_results_UNI_256_adam" \
+    --batch_size 1 --lr 0.000005 --opt adam --reg 0.0001 \
+    --weighted_sample --max_epochs 10 --encoding_dim 1024 \
+    --label_col class_label --k 5 --bag_loss cross_entropy --n_classes 2 --num_patches 2048 --wsi_projection_dim 256
+
+
+DATA_ROOT_DIR='/hpc2hdd/home/yangwu/WY/im4MEC/feature_bags_UNI_360um/' 
+BASE_DIR="/hpc2hdd/home/yangwu/WY/SurvPath" 
+STUDY="lihc" 
+MODEL="survpath"
+CUDA_VISIBLE_DEVICES=0 python main-rad_test.py \
+    --study tcga_${STUDY} --task survival --split_dir splits --which_splits 550_5fold \
+    --modality $MODEL --data_root_dir $DATA_ROOT_DIR --label_file datasets_csv/metadata_all_endpoints/tcga_${STUDY}.csv \
+    --rad_data_dir '/hpc2hdd/home/yangwu/WY/dl-mri/output/' \
+    --results_dir "4.10_results_UNI_360_radam" \
+    --batch_size 1 --lr 0.000005 --opt radam --reg 0.0001 \
+    --weighted_sample --max_epochs 10 --encoding_dim 1024 \
+    --label_col class_label --k 5 --bag_loss cross_entropy --n_classes 2 --num_patches 2048  --wsi_projection_dim 256
+
+DATA_ROOT_DIR='/hpc2hdd/home/yangwu/WY/im4MEC/feature_bags_UNI_360um/' 
+BASE_DIR="/hpc2hdd/home/yangwu/WY/SurvPath" 
+STUDY="lihc" 
+MODEL="survpath"
+CUDA_VISIBLE_DEVICES=0 python main-rad_test.py \
+    --study tcga_${STUDY} --task survival --split_dir splits --which_splits 550_5fold \
+    --modality $MODEL --data_root_dir $DATA_ROOT_DIR --label_file datasets_csv/metadata_all_endpoints/tcga_${STUDY}.csv \
+    --rad_data_dir '/hpc2hdd/home/yangwu/WY/dl-mri/output/' \
+    --results_dir "4.10_results_UNI_360_adam" \
+    --batch_size 1 --lr 0.000005 --opt adam --reg 0.0001 \
+    --weighted_sample --max_epochs 10 --encoding_dim 1024 \
+    --label_col class_label --k 5 --bag_loss cross_entropy --n_classes 2 --num_patches 1024  --wsi_projection_dim 256
+
+#### 545cases_769slides  ####
+
+DATA_ROOT_DIR='/hpc2hdd/home/yangwu/WY/im4MEC/feature_bags_UNI_256um/' 
+BASE_DIR="/hpc2hdd/home/yangwu/WY/SurvPath" 
+STUDY="lihc" 
+MODEL="survpath"
+CUDA_VISIBLE_DEVICES=0 python main-rad_test.py \
+    --study tcga_${STUDY} --task survival --split_dir splits --which_splits 545_5fold \
+    --modality $MODEL --data_root_dir $DATA_ROOT_DIR --label_file datasets_csv/metadata_all_endpoints/545tcga_${STUDY}.csv \
+    --rad_data_dir '/hpc2hdd/home/yangwu/WY/dl-mri/output/' \
+    --results_dir "4.10_results_UNI_256_adam_769slide" \
+    --batch_size 1 --lr 0.000005 --opt adam --reg 0.0001 \
+    --weighted_sample --max_epochs 10 --encoding_dim 1024 \
+    --label_col class_label --k 5 --bag_loss cross_en+tropy --n_classes 2 --num_patches 4096  --wsi_projection_dim 256
+
+DATA_ROOT_DIR='/hpc2hdd/home/yangwu/WY/im4MEC/feature_bags_UNI_256um/' 
+BASE_DIR="/hpc2hdd/home/yangwu/WY/SurvPath" 
+STUDY="lihc" 
+MODEL="survpath"
+CUDA_VISIBLE_DEVICES=0 python main-rad_test.py \
+    --study tcga_${STUDY} --task survival --split_dir splits --which_splits 545_5fold \
+    --modality $MODEL --data_root_dir $DATA_ROOT_DIR --label_file datasets_csv/metadata_all_endpoints/545tcga_${STUDY}.csv \
+    --rad_data_dir '/hpc2hdd/home/yangwu/WY/dl-mri/output/' \
+    --results_dir "4.10_results_UNI_256_adam_769slide" \
+    --batch_size 1 --lr 0.000005 --opt adam --reg 0.0001 \
+    --weighted_sample --max_epochs 10 --encoding_dim 1024 \
+    --label_col class_label --k 5 --bag_loss cross_entropy --n_classes 2 --num_patches 2048  --wsi_projection_dim 256
+
+DATA_ROOT_DIR='/hpc2hdd/home/yangwu/WY/im4MEC/feature_bags_ctp_128/' 
+BASE_DIR="/hpc2hdd/home/yangwu/WY/SurvPath" 
+STUDY="lihc" 
+MODEL="survpath"
+CUDA_VISIBLE_DEVICES=0 python main-rad_test.py \
+    --study tcga_${STUDY} --task survival --split_dir splits --which_splits 545_5fold \
+    --modality $MODEL --data_root_dir $DATA_ROOT_DIR --label_file datasets_csv/metadata_all_endpoints/545tcga_${STUDY}.csv \
+    --rad_data_dir '/hpc2hdd/home/yangwu/WY/dl-mri/output/' \
+    --results_dir "4.10_results_CTP128_adam_769slide" \
+    --batch_size 1 --lr 0.000004 --opt adam --reg 0.0001 \
+    --weighted_sample --max_epochs 10 --encoding_dim 1024 \
+    --label_col class_label --k 5 --bag_loss cross_entropy --n_classes 2 --num_patches 4096  --wsi_projection_dim 256
+
+DATA_ROOT_DIR='/hpc2hdd/home/yangwu/WY/im4MEC/feature_bags_ctp_360/' 
+BASE_DIR="/hpc2hdd/home/yangwu/WY/SurvPath" 
+STUDY="lihc" 
+MODEL="survpath"
+CUDA_VISIBLE_DEVICES=0 python main-rad_test.py \
+    --study tcga_${STUDY} --task survival --split_dir splits --which_splits 545_5fold \
+    --modality $MODEL --data_root_dir $DATA_ROOT_DIR --label_file datasets_csv/metadata_all_endpoints/545tcga_${STUDY}.csv \
+    --rad_data_dir '/hpc2hdd/home/yangwu/WY/dl-mri/output/' \
+    --results_dir "4.10_results_CTP360_adam_769slide" \
+    --batch_size 1 --lr 0.000004 --opt adam --reg 0.0001 \
+    --weighted_sample --max_epochs 10 --encoding_dim 1024 \
+    --label_col class_label --k 5 --bag_loss cross_entropy --n_classes 2 --num_patches 2048  --wsi_projection_dim 256
+
+### 4.11
+DATA_ROOT_DIR='/hpc2hdd/home/yangwu/WY/im4MEC/feature_bags_ctp_128/' 
+BASE_DIR="/hpc2hdd/home/yangwu/WY/SurvPath" 
+STUDY="lihc" 
+MODEL="survpath"
+CUDA_VISIBLE_DEVICES=0 python main-rad_final.py \
+    --study tcga_${STUDY} --task survival --split_dir splits --which_splits 545_5fold \
+    --modality $MODEL --data_root_dir $DATA_ROOT_DIR --label_file datasets_csv/metadata_all_endpoints/545tcga_${STUDY}.csv \
+    --rad_data_dir '/hpc2hdd/home/yangwu/WY/dl-mri/output/' \
+    --results_dir "4.12_results_ctp128_adam_769slide_sample" \
+    --batch_size 1 --lr 0.000004 --opt adam --reg 0.0001 \
+    --weighted_sample --max_epochs 10 --encoding_dim 1024 \
+    --label_col class_label --k 5 --bag_loss cross_entropy --n_classes 2 --num_patches 4096  --wsi_projection_dim 256
+
+DATA_ROOT_DIR='/hpc2hdd/home/yangwu/WY/im4MEC/feature_bags_UNI_256um/' 
+BASE_DIR="/hpc2hdd/home/yangwu/WY/SurvPath" 
+STUDY="lihc" 
+MODEL="survpath"
+CUDA_VISIBLE_DEVICES=0 python main-rad_test.py \
+    --study tcga_${STUDY} --task survival --split_dir splits --which_splits 545_5fold \
+    --modality $MODEL --data_root_dir $DATA_ROOT_DIR --label_file datasets_csv/metadata_all_endpoints/545tcga_${STUDY}.csv \
+    --rad_data_dir '/hpc2hdd/home/yangwu/WY/dl-mri/output/' \
+    --results_dir "4.11_results_UNI256_adam_769slide" \
+    --batch_size 1 --lr 0.000004 --opt adam --reg 0.0001 \
+    --weighted_sample --max_epochs 10 --encoding_dim 1024 \
+    --label_col class_label --k 5 --bag_loss cross_entropy --n_classes 2 --num_patches 2048  --wsi_projection_dim 256
+### 4.12
+DATA_ROOT_DIR='/hpc2hdd/home/yangwu/WY/im4MEC/feature_bags_ctp_128/' 
+BASE_DIR="/hpc2hdd/home/yangwu/WY/SurvPath" 
+STUDY="lihc" 
+MODEL="survpath"
+CUDA_VISIBLE_DEVICES=0 python main-rad_test.py \
+    --study tcga_${STUDY} --task survival --split_dir splits --which_splits 545_5fold \
+    --modality $MODEL --data_root_dir $DATA_ROOT_DIR --label_file datasets_csv/metadata_all_endpoints/545tcga_${STUDY}.csv \
+    --rad_data_dir '/hpc2hdd/home/yangwu/WY/dl-mri/output/' \
+    --results_dir "4.12_results_ctp128_adam_769slide_drop0.2" \
+    --batch_size 1 --lr 0.00001 --opt adam --reg 0.0001 \
+    --weighted_sample --max_epochs 10 --encoding_dim 1024 \
+    --label_col class_label --k 5 --bag_loss cross_entropy --n_classes 2 --num_patches 4096  --wsi_projection_dim 256
+
+DATA_ROOT_DIR='/hpc2hdd/home/yangwu/WY/im4MEC/feature_bags_ctp_128/' 
+BASE_DIR="/hpc2hdd/home/yangwu/WY/SurvPath" 
+STUDY="lihc" 
+MODEL="survpath"
+CUDA_VISIBLE_DEVICES=0 python main-rad_test.py \
+    --study tcga_${STUDY} --task survival --split_dir splits --which_splits 545_5fold \
+    --modality $MODEL --data_root_dir $DATA_ROOT_DIR --label_file datasets_csv/metadata_all_endpoints/545tcga_${STUDY}.csv \
+    --rad_data_dir '/hpc2hdd/home/yangwu/WY/dl-mri/output/' \
+    --results_dir "4.17_results_ctp128_adam_769slide_drop0.1" \
+    --batch_size 1 --lr 0.00001 --opt adam --reg 0.0001 \
+    --weighted_sample --max_epochs 10 --encoding_dim 768 \
+    --label_col class_label --k 5 --bag_loss cross_entropy --n_classes 2 --num_patches 4096  --wsi_projection_dim 256
+
+### 4.15
+DATA_ROOT_DIR='/hpc2hdd/home/yangwu/WY/im4MEC/feature_bags_ctp_128/' 
+BASE_DIR="/hpc2hdd/home/yangwu/WY/SurvPath" 
+STUDY="lihc" 
+MODEL="survpath" 
+CUDA_VISIBLE_DEVICES=0 python main-rad_fufa.py \
+    --study tcga_${STUDY} --task survival --split_dir splits --which_splits 545_5fold \
+    --modality $MODEL --data_root_dir $DATA_ROOT_DIR --label_file datasets_csv/metadata_all_endpoints/545tcga_${STUDY}.csv \
+    --rad_data_dir '/hpc2hdd/home/yangwu/WY/dl-mri/rad_features_dino.h5' \
+    --results_dir "4.15_results_dino" \
+    --batch_size 1 --lr 0.0005 --opt radam --reg 0.0001 \
+    --alpha_surv 0.5 --weighted_sample --max_epochs 10 --encoding_dim 768 \
+    --label_col class_label --k 5 --bag_loss bce_logits --n_classes 2 --num_patches 4096 --wsi_projection_dim 256
+
+DATA_ROOT_DIR='/hpc2hdd/home/yangwu/WY/im4MEC/feature_bags_ctp_128/' 
+BASE_DIR="/hpc2hdd/home/yangwu/WY/SurvPath" 
+STUDY="lihc" 
+MODEL="survpath" 
+CUDA_VISIBLE_DEVICES=0 python main-rad_fufa.py \
+    --study tcga_${STUDY} --task survival --split_dir splits --which_splits 545_5fold \
+    --modality $MODEL --data_root_dir $DATA_ROOT_DIR --label_file datasets_csv/metadata_all_endpoints/545tcga_${STUDY}.csv \
+    --rad_data_dir '/hpc2hdd/home/yangwu/WY/dl-mri/rad_features_dino.h5' \
+    --results_dir "4.15_results_dino" \
+    --batch_size 1 --lr 0.0002 --opt radam --reg 0.0001 \
+    --alpha_surv 0.5 --weighted_sample --max_epochs 10 --encoding_dim 768 \
+    --label_col class_label --k 5 --bag_loss bce_logits --n_classes 2 --num_patches 4096 --wsi_projection_dim 256
+
+DATA_ROOT_DIR='/hpc2hdd/home/yangwu/WY/im4MEC/feature_bags_ctp_128/' 
+BASE_DIR="/hpc2hdd/home/yangwu/WY/SurvPath" 
+STUDY="lihc" 
+MODEL="survpath" 
+CUDA_VISIBLE_DEVICES=0 python main-rad_fufa.py \
+    --study tcga_${STUDY} --task survival --split_dir splits --which_splits 545_5fold \
+    --modality $MODEL --data_root_dir $DATA_ROOT_DIR --label_file datasets_csv/metadata_all_endpoints/545tcga_${STUDY}.csv \
+    --rad_data_dir '/hpc2hdd/home/yangwu/WY/dl-mri/rad_features_dino.h5' \
+    --results_dir "4.15_results_dino_NEW" \
+    --batch_size 1 --lr 0.0002 --opt radam --reg 0.0001 \
+    --alpha_surv 0.5 --weighted_sample --max_epochs 10 --encoding_dim 768 \
+    --label_col class_label --k 5 --bag_loss bce_logits --n_classes 2 --num_patches 4096 --wsi_projection_dim 256
+
+DATA_ROOT_DIR='/hpc2hdd/home/yangwu/WY/im4MEC/feature_bags_ctp_360/' 
+BASE_DIR="/hpc2hdd/home/yangwu/WY/SurvPath" 
+STUDY="lihc" 
+MODEL="survpath" 
+CUDA_VISIBLE_DEVICES=0 python main-rad_fufa.py \
+    --study tcga_${STUDY} --task survival --split_dir splits --which_splits 545_5fold \
+    --modality $MODEL --data_root_dir $DATA_ROOT_DIR --label_file datasets_csv/metadata_all_endpoints/545tcga_${STUDY}.csv \
+    --rad_data_dir '/hpc2hdd/home/yangwu/WY/dl-mri/rad_features_dino.h5' \
+    --results_dir "4.15_results_dino_ctp360_wsi+rad" \
+    --batch_size 1 --lr 0.0002 --opt radam --reg 0.0001 \
+    --alpha_surv 0.5 --weighted_sample --max_epochs 10 --encoding_dim 768 \
+    --label_col class_label --k 5 --bag_loss bce_logits --n_classes 2 --num_patches 1024 --wsi_projection_dim 256
+
+DATA_ROOT_DIR='/hpc2hdd/home/yangwu/WY/im4MEC/feature_bags_UNI_360um/' 
+BASE_DIR="/hpc2hdd/home/yangwu/WY/SurvPath" 
+STUDY="lihc" 
+MODEL="survpath" 
+CUDA_VISIBLE_DEVICES=0 python main-rad_fufa.py \
+    --study tcga_${STUDY} --task survival --split_dir splits --which_splits 545_5fold \
+    --modality $MODEL --data_root_dir $DATA_ROOT_DIR --label_file datasets_csv/metadata_all_endpoints/545tcga_${STUDY}.csv \
+    --rad_data_dir '/hpc2hdd/home/yangwu/WY/dl-mri/rad_features_dino.h5' \
+    --results_dir "4.15_results_dino_uni360_wsi+rad" \
+    --batch_size 1 --lr 0.00001 --opt radam --reg 0.00005 \
+    --alpha_surv 0.5 --weighted_sample --max_epochs 10 --encoding_dim 1024 \
+    --label_col class_label --k 5 --bag_loss bce_logits --n_classes 2 --num_patches 1024 --wsi_projection_dim 256
+
+DATA_ROOT_DIR='/hpc2hdd/home/yangwu/WY/im4MEC/feature_bags_UNI_256um/' 
+BASE_DIR="/hpc2hdd/home/yangwu/WY/SurvPath" 
+STUDY="lihc" 
+MODEL="survpath" 
+CUDA_VISIBLE_DEVICES=0 python main-rad_fufa.py \
+    --study tcga_${STUDY} --task survival --split_dir splits --which_splits 545_5fold \
+    --modality $MODEL --data_root_dir $DATA_ROOT_DIR --label_file datasets_csv/metadata_all_endpoints/545tcga_${STUDY}.csv \
+    --rad_data_dir '/hpc2hdd/home/yangwu/WY/dl-mri/rad_features_dino.h5' \
+    --results_dir "4.15_results_dino_uni256_wsi+rad_drop" \
+    --batch_size 1 --lr 0.0001 --opt radam --reg 0.0001 \
+    --alpha_surv 0.5 --weighted_sample --max_epochs 5 --encoding_dim 1024 \
+    --label_col class_label --k 5 --bag_loss bce_logits --n_classes 2 --num_patches 2048 --wsi_projection_dim 256
+
+DATA_ROOT_DIR='/hpc2hdd/home/yangwu/WY/im4MEC/feature_bags_UNI_256um/' 
+BASE_DIR="/hpc2hdd/home/yangwu/WY/SurvPath" 
+STUDY="lihc" 
+MODEL="survpath" 
+CUDA_VISIBLE_DEVICES=0 python main-rad_fufa.py \
+    --study tcga_${STUDY} --task survival --split_dir splits --which_splits 545_5fold \
+    --modality $MODEL --data_root_dir $DATA_ROOT_DIR --label_file datasets_csv/metadata_all_endpoints/545tcga_${STUDY}.csv \
+    --rad_data_dir '/hpc2hdd/home/yangwu/WY/dl-mri/rad_features_dino.h5' \
+    --results_dir "4.15_results_dino_uni256_all_drop" \
+    --batch_size 1 --lr 0.00005 --opt radam --reg 0.0001 \
+    --alpha_surv 0.5 --weighted_sample --max_epochs 10 --encoding_dim 1024 \
+    --label_col class_label --k 5 --bag_loss bce_logits --n_classes 2 --num_patches 2048 --wsi_projection_dim 256
+
+DATA_ROOT_DIR='/hpc2hdd/home/yangwu/WY/im4MEC/feature_bags_UNI_360um/' 
+BASE_DIR="/hpc2hdd/home/yangwu/WY/SurvPath" 
+STUDY="lihc" 
+MODEL="survpath" 
+CUDA_VISIBLE_DEVICES=0 python main-rad_fufa.py \
+    --study tcga_${STUDY} --task survival --split_dir splits --which_splits 545_5fold \
+    --modality $MODEL --data_root_dir $DATA_ROOT_DIR --label_file datasets_csv/metadata_all_endpoints/545tcga_${STUDY}.csv \
+    --rad_data_dir '/hpc2hdd/home/yangwu/WY/dl-mri/rad_features_dino.h5' \
+    --results_dir "4.15_results_dino_uni360_all_drop" \
+    --batch_size 1 --lr 0.00001 --opt radam --reg 0.0001 \
+    --alpha_surv 0.5 --weighted_sample --max_epochs 10 --encoding_dim 1024 \
+    --label_col class_label --k 5 --bag_loss bce_logits --n_classes 2 --num_patches 2048 --wsi_projection_dim 256
+
+DATA_ROOT_DIR='/hpc2hdd/home/yangwu/WY/im4MEC/feature_bags_UNI_256um/' 
+BASE_DIR="/hpc2hdd/home/yangwu/WY/SurvPath" 
+STUDY="lihc" 
+MODEL="survpath" 
+CUDA_VISIBLE_DEVICES=0 python main-rad_fufa.py \
+    --study tcga_${STUDY} --task survival --split_dir splits --which_splits 545_5fold \
+    --modality $MODEL --data_root_dir $DATA_ROOT_DIR --label_file datasets_csv/metadata_all_endpoints/545tcga_${STUDY}.csv \
+    --rad_data_dir '/hpc2hdd/home/yangwu/WY/dl-mri/rad_features_dino.h5' \
+    --results_dir "4.15_results_dino_uni256_all_drop_sgd" \
+    --batch_size 1 --lr 0.00005 --opt sgd --reg 0.0001 \
+    --alpha_surv 0.5 --weighted_sample --max_epochs 10 --encoding_dim 1024 \
+    --label_col class_label --k 5 --bag_loss bce_logits --n_classes 2 --num_patches 2048 --wsi_projection_dim 256
+
+DATA_ROOT_DIR='/hpc2hdd/home/yangwu/WY/im4MEC/feature_bags_UNI_256um/' 
+BASE_DIR="/hpc2hdd/home/yangwu/WY/SurvPath" 
+STUDY="lihc" 
+MODEL="survpath" 
+CUDA_VISIBLE_DEVICES=0 python main-rad_fufa.py \
+    --study tcga_${STUDY} --task survival --split_dir splits --which_splits 545_5fold \
+    --modality $MODEL --data_root_dir $DATA_ROOT_DIR --label_file datasets_csv/metadata_all_endpoints/545tcga_${STUDY}.csv \
+    --rad_data_dir '/hpc2hdd/home/yangwu/WY/dl-mri/rad_features_dino.h5' \
+    --results_dir "4.15_results_dino_uni256_wsi+rad_drop_adam" \
+    --batch_size 1 --lr 0.0001 --opt adam --reg 0.0001 \
+    --alpha_surv 0.5 --weighted_sample --max_epochs 5 --encoding_dim 1024 \
+    --label_col class_label --k 5 --bag_loss bce_logits --n_classes 2 --num_patches 2048 --wsi_projection_dim 256
+
+### 4.17
+DATA_ROOT_DIR='/hpc2hdd/home/yangwu/WY/im4MEC/feature_bags_UNI_256um/' 
+BASE_DIR="/hpc2hdd/home/yangwu/WY/SurvPath" 
+STUDY="lihc" 
+MODEL="survpath" 
+CUDA_VISIBLE_DEVICES=0 python main-rad_fufa.py \
+    --study tcga_${STUDY} --task survival --split_dir splits --which_splits 545_5fold \
+    --modality $MODEL --data_root_dir $DATA_ROOT_DIR --label_file datasets_csv/metadata_all_endpoints/545tcga_${STUDY}.csv \
+    --rad_data_dir '/hpc2hdd/home/yangwu/WY/dl-mri/rad_features_dino.h5' \
+    --results_dir "4.17_results_dino_uni256_all_drop" \
+    --batch_size 1 --lr 0.0001 --opt radam --reg 0.0001 \
+    --alpha_surv 0.5 --weighted_sample --max_epochs 10 --encoding_dim 1024 \
+    --label_col class_label --k 5 --bag_loss bce_logits --n_classes 2 --num_patches 2048 --wsi_projection_dim 256
+
+DATA_ROOT_DIR='/hpc2hdd/home/yangwu/WY/im4MEC/feature_bags_ctp_128/' 
+BASE_DIR="/hpc2hdd/home/yangwu/WY/SurvPath" 
+STUDY="lihc" 
+MODEL="survpath"
+CUDA_VISIBLE_DEVICES=0 python main-rad_test.py \
+    --study tcga_${STUDY} --task survival --split_dir splits --which_splits 545_5fold \
+    --modality $MODEL --data_root_dir $DATA_ROOT_DIR --label_file datasets_csv/metadata_all_endpoints/545tcga_${STUDY}.csv \
+    --rad_data_dir '/hpc2hdd/home/yangwu/WY/dl-mri/output/' \
+    --results_dir "4.17_results_ctp128_adam_769slide_wsi+rad_drop0.1" \
+    --batch_size 1 --lr 0.00004 --opt adam --reg 0.0001 \
+    --weighted_sample --max_epochs 10 --encoding_dim 768 \
+    --label_col class_label --k 5 --bag_loss cross_entropy --n_classes 2 --num_patches 4096  --wsi_projection_dim 256
+
+### 4.18
+DATA_ROOT_DIR='/hpc2hdd/home/yangwu/WY/im4MEC/feature_bags_UNI_256um/' 
+BASE_DIR="/hpc2hdd/home/yangwu/WY/SurvPath" 
+STUDY="lihc" 
+MODEL="survpath"
+CUDA_VISIBLE_DEVICES=0 python main-rad_fufa.py \
+    --study tcga_${STUDY} --task survival --split_dir splits --which_splits 541_5fold \
+    --modality $MODEL --data_root_dir $DATA_ROOT_DIR --label_file datasets_csv/metadata_all_endpoints/541tcga_${STUDY}.csv \
+    --rad_data_dir '/hpc2hdd/home/yangwu/WY/dl-mri/rad_features_dino.h5' \
+    --results_dir "4.18_results_UNI256_adam_wsi+rad_drop0.1" \
+    --batch_size 1 --lr 0.00004 --opt adam --reg 0.0001 \
+    --weighted_sample --max_epochs 10 --encoding_dim 1024 \
+    --label_col class_label --k 5 --bag_loss bce_logits --n_classes 2 --num_patches 2048  --wsi_projection_dim 256
+
+DATA_ROOT_DIR='/hpc2hdd/home/yangwu/WY/im4MEC/feature_bags_UNI_256um/' 
+BASE_DIR="/hpc2hdd/home/yangwu/WY/SurvPath" 
+STUDY="lihc" 
+MODEL="survpath"
+CUDA_VISIBLE_DEVICES=0 python main-rad_fufa.py \
+    --study tcga_${STUDY} --task survival --split_dir splits --which_splits 541_5fold \
+    --modality $MODEL --data_root_dir $DATA_ROOT_DIR --label_file datasets_csv/metadata_all_endpoints/541tcga_${STUDY}.csv \
+    --rad_data_dir '/hpc2hdd/home/yangwu/WY/dl-mri/rad_features_dino.h5' \
+    --results_dir "4.18_results_UNI256_sgd_wsi+rad_drop0.1" \
+    --batch_size 1 --lr 0.00001 --opt sgd --reg 0.0001 \
+    --weighted_sample --max_epochs 10 --encoding_dim 1024 \
+    --label_col class_label --k 5 --bag_loss bce_logits --n_classes 2 --num_patches 2048  --wsi_projection_dim 256
+
+DATA_ROOT_DIR='/hpc2hdd/home/yangwu/WY/im4MEC/feature_bags_UNI_256um/' 
+BASE_DIR="/hpc2hdd/home/yangwu/WY/SurvPath" 
+STUDY="lihc" 
+MODEL="survpath"
+CUDA_VISIBLE_DEVICES=0 python main-rad_fufa.py \
+    --study tcga_${STUDY} --task survival --split_dir splits --which_splits 541_5fold \
+    --modality $MODEL --data_root_dir $DATA_ROOT_DIR --label_file datasets_csv/metadata_all_endpoints/541tcga_${STUDY}.csv \
+    --rad_data_dir '/hpc2hdd/home/yangwu/WY/dl-mri/rad_features_dino.h5' \
+    --results_dir "4.18_results_UNI256_sgd_wsi+rad_drop0.1" \
+    --batch_size 1 --lr 0.0001 --opt sgd --reg 0.0001 \
+    --weighted_sample --max_epochs 10 --encoding_dim 1024 \
+    --label_col class_label --k 5 --bag_loss bce_logits --n_classes 2 --num_patches 2048  --wsi_projection_dim 256
+
+DATA_ROOT_DIR='/hpc2hdd/home/yangwu/WY/im4MEC/feature_bags_UNI_256um/' 
+BASE_DIR="/hpc2hdd/home/yangwu/WY/SurvPath" 
+STUDY="lihc" 
+MODEL="survpath"
+CUDA_VISIBLE_DEVICES=0 python main-rad_fufa.py \
+    --study tcga_${STUDY} --task survival --split_dir splits --which_splits 541_5fold \
+    --modality $MODEL --data_root_dir $DATA_ROOT_DIR --label_file datasets_csv/metadata_all_endpoints/541tcga_${STUDY}.csv \
+    --rad_data_dir '/hpc2hdd/home/yangwu/WY/dl-mri/rad_features_dino.h5' \
+    --results_dir "4.18_results_UNI256_sgd_all_drop0.1" \
+    --batch_size 1 --lr 0.0001 --opt sgd --reg 0.0001 \
+    --weighted_sample --max_epochs 10 --encoding_dim 1024 \
+    --label_col class_label --k 5 --bag_loss bce_logits --n_classes 2 --num_patches 2048  --wsi_projection_dim 256
+
+DATA_ROOT_DIR='/hpc2hdd/home/yangwu/WY/im4MEC/feature_bags_UNI_256um/' 
+BASE_DIR="/hpc2hdd/home/yangwu/WY/SurvPath" 
+STUDY="lihc" 
+MODEL="survpath"
+CUDA_VISIBLE_DEVICES=0 python main-rad_fufa.py \
+    --study tcga_${STUDY} --task survival --split_dir splits --which_splits 541_5fold \
+    --modality $MODEL --data_root_dir $DATA_ROOT_DIR --label_file datasets_csv/metadata_all_endpoints/541tcga_${STUDY}.csv \
+    --rad_data_dir '/hpc2hdd/home/yangwu/WY/dl-mri/rad_features_dino.h5' \
+    --results_dir "4.19_results_UNI256_sgd_all_drop0.1" \
+    --batch_size 1 --lr 0.0001 --opt sgd --reg 0.0001 \
+    --weighted_sample --max_epochs 10 --encoding_dim 1024 \
+    --label_col class_label --k 5 --bag_loss bce_logits --n_classes 2 --num_patches 2048  --wsi_projection_dim 256
+
+DATA_ROOT_DIR='/hpc2hdd/home/yangwu/WY/im4MEC/feature_bags_UNI_256um/' 
+BASE_DIR="/hpc2hdd/home/yangwu/WY/SurvPath" 
+STUDY="lihc" 
+MODEL="survpath"
+CUDA_VISIBLE_DEVICES=0 python main-rad_fufa.py \
+    --study tcga_${STUDY} --task survival --split_dir splits --which_splits 541_5fold \
+    --modality $MODEL --data_root_dir $DATA_ROOT_DIR --label_file datasets_csv/metadata_all_endpoints/541tcga_${STUDY}.csv \
+    --rad_data_dir '/hpc2hdd/home/yangwu/WY/dl-mri/rad_features_dino.h5' \
+    --results_dir "4.19_results_UNI256_sgd_cli_drop0.1" \
+    --batch_size 1 --lr 0.0001 --opt sgd --reg 0.0001 \
+    --weighted_sample --max_epochs 10 --encoding_dim 1024 \
+    --label_col class_label --k 5 --bag_loss bce_logits --n_classes 2 --num_patches 2048  --wsi_projection_dim 256
+### 4.19clinical_featuresone hot
+DATA_ROOT_DIR='/hpc2hdd/home/yangwu/WY/im4MEC/feature_bags_UNI_256um/' 
+BASE_DIR="/hpc2hdd/home/yangwu/WY/SurvPath" 
+STUDY="lihc" 
+MODEL="survpath"
+CUDA_VISIBLE_DEVICES=0 python main-rad_fufa.py \
+    --study tcga_${STUDY} --task survival --split_dir splits --which_splits 541_5fold \
+    --modality $MODEL --data_root_dir $DATA_ROOT_DIR --label_file datasets_csv/metadata_all_endpoints/541tcga_${STUDY}.csv \
+    --rad_data_dir '/hpc2hdd/home/yangwu/WY/dl-mri/rad_features_dino.h5' \
+    --results_dir "4.18_results_UNI256_sgd_cli_drop0.1" \
+    --batch_size 1 --lr 0.0001 --opt sgd --reg 0.001 \
+    --weighted_sample --max_epochs 10 --encoding_dim 1024 \
+    --label_col class_label --k 5 --bag_loss bce_logits --n_classes 2 --num_patches 2048  --wsi_projection_dim 256
+### 4.21
+DATA_ROOT_DIR='/hpc2hdd/home/yangwu/WY/im4MEC/feature_bags_UNI_256um/' 
+BASE_DIR="/hpc2hdd/home/yangwu/WY/SurvPath" 
+STUDY="lihc" 
+MODEL="survpath"
+CUDA_VISIBLE_DEVICES=0 python main-rad_fufa.py \
+    --study tcga_${STUDY} --task survival --split_dir splits --which_splits 541_5fold \
+    --modality $MODEL --data_root_dir $DATA_ROOT_DIR --label_file datasets_csv/metadata_all_endpoints/541tcga_${STUDY}.csv \
+    --rad_data_dir '/hpc2hdd/home/yangwu/WY/dl-mri/rad_features_dino.h5' \
+    --results_dir "4.19_results_UNI256_sgd_all_drop0.1" \
+    --batch_size 1 --lr 0.00001 --opt sgd --reg 0.001 \
+    --weighted_sample --max_epochs 10 --encoding_dim 1024 \
+    --label_col class_label --k 5 --bag_loss bce_logits --n_classes 2 --num_patches 2048  --wsi_projection_dim 256
+
+####cli
+DATA_ROOT_DIR='/hpc2hdd/home/yangwu/WY/im4MEC/feature_bags_UNI_256um/' 
+BASE_DIR="/hpc2hdd/home/yangwu/WY/SurvPath" 
+STUDY="lihc" 
+MODEL="survpath"
+CUDA_VISIBLE_DEVICES=0 python main-rad_fufa.py \
+    --study tcga_${STUDY} --task survival --split_dir splits --which_splits 541_5fold \
+    --modality $MODEL --data_root_dir $DATA_ROOT_DIR --label_file datasets_csv/metadata_all_endpoints/541tcga_${STUDY}.csv \
+    --rad_data_dir '/hpc2hdd/home/yangwu/WY/dl-mri/rad_features_dino.h5' \
+    --results_dir "4.19_results_UNI256_sgd_cli_drop0.1" \
+    --batch_size 1 --lr 0.0001 --opt sgd --reg 0.001 \
+    --weighted_sample --max_epochs 10 --encoding_dim 1024 \
+    --label_col class_label --k 5 --bag_loss bce_logits --n_classes 2 --num_patches 2048  --wsi_projection_dim 256
+
+
+
+### 
+DATA_ROOT_DIR='/hpc2hdd/home/yangwu/WY/im4MEC/feature_bags_UNI_256um/' 
+BASE_DIR="/hpc2hdd/home/yangwu/WY/SurvPath" 
+STUDY="lihc" 
+MODEL="survpath"
+CUDA_VISIBLE_DEVICES=0 python main-rad_fufa.py \
+    --study tcga_${STUDY} --task survival --split_dir splits --which_splits 541_5fold \
+    --modality $MODEL --data_root_dir $DATA_ROOT_DIR --label_file datasets_csv/metadata_all_endpoints/541tcga_${STUDY}.csv \
+    --rad_data_dir '/hpc2hdd/home/yangwu/WY/dl-mri/rad_features_dino.h5' \
+    --results_dir "4.21_results_UNI256_sgd_all_drop0.1" \
+    --batch_size 1 --lr 0.0001 --opt sgd --reg 0.001 \
+    --weighted_sample --max_epochs 10 --encoding_dim 1024 \
+    --label_col class_label --k 5 --bag_loss bce_logits --n_classes 2 --num_patches 2048  --wsi_projection_dim 256
+
+DATA_ROOT_DIR='/hpc2hdd/home/yangwu/WY/im4MEC/feature_bags_UNI_256um/' 
+BASE_DIR="/hpc2hdd/home/yangwu/WY/SurvPath" 
+STUDY="lihc" 
+MODEL="survpath"
+CUDA_VISIBLE_DEVICES=0 python main-rad_fufa.py \
+    --study tcga_${STUDY} --task survival --split_dir splits --which_splits 541_5fold \
+    --modality $MODEL --data_root_dir $DATA_ROOT_DIR --label_file datasets_csv/metadata_all_endpoints/541tcga_${STUDY}.csv \
+    --rad_data_dir '/hpc2hdd/home/yangwu/WY/dl-mri/rad_features_dino.h5' \
+    --results_dir "4.21_results_UNI256_sgd_all_drop0.15" \
+    --batch_size 1 --lr 0.0001 --opt sgd --reg 0.001 \
+    --weighted_sample --max_epochs 10 --encoding_dim 1024 \
+    --label_col class_label --k 5 --bag_loss bce_logits --n_classes 2 --num_patches 2048  --wsi_projection_dim 256
+
+DATA_ROOT_DIR='/hpc2hdd/home/yangwu/WY/im4MEC/feature_bags_UNI_256um/' 
+BASE_DIR="/hpc2hdd/home/yangwu/WY/SurvPath" 
+STUDY="lihc" 
+MODEL="survpath"
+CUDA_VISIBLE_DEVICES=0 python main-rad_fufa.py \
+    --study tcga_${STUDY} --task survival --split_dir splits --which_splits 541_5fold \
+    --modality $MODEL --data_root_dir $DATA_ROOT_DIR --label_file datasets_csv/metadata_all_endpoints/541tcga_${STUDY}.csv \
+    --rad_data_dir '/hpc2hdd/home/yangwu/WY/dl-mri/rad_features_dino.h5' \
+    --results_dir "4.19_results_UNI256_sgd_all_drop0.2" \
+    --batch_size 1 --lr 0.00001 --opt sgd --reg 0.001 \
+    --weighted_sample --max_epochs 10 --encoding_dim 1024 \
+    --label_col class_label --k 5 --bag_loss bce_logits --n_classes 2 --num_patches 2048  --wsi_projection_dim 256
+#### 
+   4.19 train sample=T,VAL sample=F;4.21T;4.22F, ####
+
+DATA_ROOT_DIR='/hpc2hdd/home/yangwu/WY/im4MEC/feature_bags_UNI_256um/' 
+BASE_DIR="/hpc2hdd/home/yangwu/WY/SurvPath" 
+STUDY="lihc" 
+MODEL="survpath"
+CUDA_VISIBLE_DEVICES=0 python main-rad_fufa.py \
+    --study tcga_${STUDY} --task survival --split_dir splits --which_splits 541_5fold \
+    --modality $MODEL --data_root_dir $DATA_ROOT_DIR --label_file datasets_csv/metadata_all_endpoints/541tcga_${STUDY}.csv \
+    --rad_data_dir '/hpc2hdd/home/yangwu/WY/dl-mri/rad_features_dino.h5' \
+    --results_dir "4.22_results_UNI256_sgd_all_drop0.2" \
+    --batch_size 1 --lr 0.0001 --opt sgd --reg 0.001 \
+    --weighted_sample --max_epochs 10 --encoding_dim 1024 \
+    --label_col class_label --k 5 --bag_loss bce_logits --n_classes 2 --num_patches 2048  --wsi_projection_dim 256
+
+
+DATA_ROOT_DIR='/hpc2hdd/home/yangwu/WY/im4MEC/feature_bags_UNI_256um/' 
+BASE_DIR="/hpc2hdd/home/yangwu/WY/SurvPath" 
+STUDY="lihc" 
+MODEL="survpath"
+CUDA_VISIBLE_DEVICES=0 python main-rad_sam.py \
+    --study tcga_${STUDY} --task survival --split_dir splits --which_splits 541_5fold \
+    --modality $MODEL --data_root_dir $DATA_ROOT_DIR --label_file datasets_csv/metadata_all_endpoints/541tcga_${STUDY}.csv \
+    --rad_data_dir '/hpc2hdd/home/yangwu/WY/dl-mri/SAM-Med2D/rad_features_sam.h5' \
+    --results_dir "4.22_results_UNI256_sam_sgd_all_drop0.2" \
+    --batch_size 1 --lr 0.0001 --opt sgd --reg 0.001 \
+    --weighted_sample --max_epochs 10 --encoding_dim 1024 \
+    --label_col class_label --k 5 --bag_loss bce_logits --n_classes 2 --num_patches 2048  --wsi_projection_dim 256
+
+
+DATA_ROOT_DIR='/hpc2hdd/home/yangwu/WY/im4MEC/feature_bags_UNI_256um/' 
+BASE_DIR="/hpc2hdd/home/yangwu/WY/SurvPath" 
+STUDY="lihc" 
+MODEL="survpath"
+CUDA_VISIBLE_DEVICES=0 python main-rad_sam.py \
+    --study tcga_${STUDY} --task survival --split_dir splits --which_splits 541_5fold \
+    --modality $MODEL --data_root_dir $DATA_ROOT_DIR --label_file datasets_csv/metadata_all_endpoints/541tcga_${STUDY}.csv \
+    --rad_data_dir '/hpc2hdd/home/yangwu/WY/dl-mri/SAM-Med2D/rad_features_sam.h5' \
+    --results_dir "4.19_results_UNI256_sam_sgd_all_drop0.1" \
+    --batch_size 1 --lr 0.001 --opt sgd --reg 0.001 \
+    --weighted_sample --max_epochs 10 --encoding_dim 1024 \
+    --label_col class_label --k 5 --bag_loss bce_logits --n_classes 2 --num_patches 2048  --wsi_projection_dim 256
+
+DATA_ROOT_DIR='/hpc2hdd/home/yangwu/WY/im4MEC/feature_bags_UNI_360um/' 
+BASE_DIR="/hpc2hdd/home/yangwu/WY/SurvPath" 
+STUDY="lihc" 
+MODEL="survpath"
+CUDA_VISIBLE_DEVICES=0 python main-rad_fufa.py \
+    --study tcga_${STUDY} --task survival --split_dir splits --which_splits 541_5fold \
+    --modality $MODEL --data_root_dir $DATA_ROOT_DIR --label_file datasets_csv/metadata_all_endpoints/541tcga_${STUDY}.csv \
+    --rad_data_dir '/hpc2hdd/home/yangwu/WY/dl-mri/rad_features_dino.h5' \
+    --results_dir "4.22_results_UNI360_sgd_all_drop0.1" \
+    --batch_size 1 --lr 0.00005 --opt sgd --reg 0.001 \
+    --weighted_sample --max_epochs 10 --encoding_dim 1024 \
+    --label_col class_label --k 5 --bag_loss bce_logits --n_classes 2 --num_patches 2048  --wsi_projection_dim 256
+####4.25,drop，label，
+DATA_ROOT_DIR='/hpc2hdd/home/yangwu/WY/im4MEC/feature_bags_UNI_256um/' 
+BASE_DIR="/hpc2hdd/home/yangwu/WY/SurvPath" 
+STUDY="lihc" 
+MODEL="survpath"
+CUDA_VISIBLE_DEVICES=0 python main-rad_test.py \
+    --study tcga_${STUDY} --task survival --split_dir splits --which_splits 541_5fold \
+    --modality $MODEL --data_root_dir $DATA_ROOT_DIR --label_file datasets_csv/metadata_all_endpoints/541tcga_${STUDY}.csv \
+    --rad_data_dir '/hpc2hdd/home/yangwu/WY/dl-mri/output/' \
+    --results_dir "4.25_results_UNI_256_sgd_541case" \
+    --batch_size 1 --lr 0.0001 --opt sgd --reg 0.0001 \
+    --weighted_sample --max_epochs 10 --encoding_dim 1024 \
+    --label_col class_label --k 5 --bag_loss cross_entropy --n_classes 2 --num_patches 2048  --wsi_projection_dim 256
+
+DATA_ROOT_DIR='/hpc2hdd/home/yangwu/WY/im4MEC/feature_bags_UNI_256um/' 
+BASE_DIR="/hpc2hdd/home/yangwu/WY/SurvPath" 
+STUDY="lihc" 
+MODEL="survpath"
+CUDA_VISIBLE_DEVICES=0 python main-rad_test.py \
+    --study tcga_${STUDY} --task survival --split_dir splits --which_splits 541_5fold \
+    --modality $MODEL --data_root_dir $DATA_ROOT_DIR --label_file datasets_csv/metadata_all_endpoints/541tcga_${STUDY}.csv \
+    --rad_data_dir '/hpc2hdd/home/yangwu/WY/dl-mri/output/' \
+    --results_dir "4.25_results_UNI_256_adam_drop0.15" \
+    --batch_size 1 --lr 0.0001 --opt adam --reg 0.0001 \
+    --weighted_sample --max_epochs 10 --encoding_dim 1024 \
+    --label_col class_label --k 5 --bag_loss cross_entropy --n_classes 2 --num_patches 2048  --wsi_projection_dim 256
+
+DATA_ROOT_DIR='/hpc2hdd/home/yangwu/WY/im4MEC/feature_bags_UNI_256um/' 
+BASE_DIR="/hpc2hdd/home/yangwu/WY/SurvPath" 
+STUDY="lihc" 
+MODEL="survpath"
+CUDA_VISIBLE_DEVICES=0 python main-rad_test.py \
+    --study tcga_${STUDY} --task survival --split_dir splits --which_splits 541_5fold \
+    --modality $MODEL --data_root_dir $DATA_ROOT_DIR --label_file datasets_csv/metadata_all_endpoints/541tcga_${STUDY}.csv \
+    --rad_data_dir '/hpc2hdd/home/yangwu/WY/dl-mri/output/' \
+    --results_dir "4.25_results_UNI_256_FF_adam_drop0.15" \
+    --batch_size 1 --lr 0.0001 --opt adam --reg 0.0001 \
+    --weighted_sample --max_epochs 10 --encoding_dim 1024 \
+    --label_col class_label --k 5 --bag_loss cross_entropy --n_classes 2 --num_patches 2048  --wsi_projection_dim 256
+
+#### 
+ fold3
+DATA_ROOT_DIR='/hpc2hdd/home/yangwu/WY/im4MEC/feature_bags_UNI_360um/' 
+BASE_DIR="/hpc2hdd/home/yangwu/WY/SurvPath" 
+STUDY="lihc" 
+MODEL="survpath"
+CUDA_VISIBLE_DEVICES=0 python main-rad_fufa.py \
+    --study tcga_${STUDY} --task survival --split_dir splits --which_splits fold3 \
+    --modality $MODEL --data_root_dir $DATA_ROOT_DIR --label_file datasets_csv/metadata_all_endpoints/545tcga_${STUDY}.csv \
+    --rad_data_dir '/hpc2hdd/home/yangwu/WY/dl-mri/rad_features_dino.h5' \
+    --results_dir "4.28_fold3_UNI360_TF_SGD_drop0.15" \
+    --batch_size 1 --lr 0.00002 --opt sgd --reg 0.0001 \
+    --weighted_sample --max_epochs 20 --encoding_dim 1024 \
+    --label_col class_label --k 1 --bag_loss bce_logits --n_classes 2 --num_patches 1024  --wsi_projection_dim 256
+
+DATA_ROOT_DIR='/hpc2hdd/home/yangwu/WY/im4MEC/feature_bags_UNI_360um/' 
+BASE_DIR="/hpc2hdd/home/yangwu/WY/SurvPath" 
+STUDY="lihc" 
+MODEL="survpath"
+CUDA_VISIBLE_DEVICES=0 python main-rad_generate.py \
+    --study tcga_${STUDY} --task survival --split_dir splits --which_splits fold3 \
+    --modality $MODEL --data_root_dir $DATA_ROOT_DIR --label_file datasets_csv/metadata_all_endpoints/545tcga_${STUDY}.csv \
+    --rad_data_dir '/hpc2hdd/home/yangwu/WY/dl-mri/rad_features_dino.h5' \
+    --results_dir "4.28_fold3_byslide_UNI360_TF_SGD_drop0.15" \
+    --batch_size 1 --lr 0.00001 --opt sgd --reg 0.0001 \
+    --weighted_sample --max_epochs 20 --encoding_dim 1024 \
+    --label_col class_label --k 1 --bag_loss bce_logits --n_classes 2 --num_patches 1024  --wsi_projection_dim 256
+
+### 
+DATA_ROOT_DIR='/hpc2hdd/home/yangwu/WY/im4MEC/feature_bags_UNI_360um/' 
+BASE_DIR="/hpc2hdd/home/yangwu/WY/SurvPath" 
+STUDY="lihc" 
+MODEL="survpath"
+CUDA_VISIBLE_DEVICES=0 python main-rad_generate.py \
+    --study tcga_${STUDY} --task survival --split_dir splits --which_splits fold3 \
+    --modality $MODEL --data_root_dir $DATA_ROOT_DIR --label_file datasets_csv/metadata_all_endpoints/fold3_tcga_${STUDY}.csv \
+    --rad_data_dir '/hpc2hdd/home/yangwu/WY/dl-mri/rad_features_dino.h5' \
+    --results_dir "4.28_fold3_byslide_generate_UNI360_TF_SGD_drop0.15" \
+    --batch_size 1 --lr 0.0001 --opt sgd --reg 0.0001 \
+    --weighted_sample --max_epochs 20 --encoding_dim 1024 \
+    --label_col class_label --k 1 --bag_loss bce_logits --n_classes 2 --num_patches 1024  --wsi_projection_dim 256
+
+
+### ，by slide，by case 
+
+DATA_ROOT_DIR='/hpc2hdd/home/yangwu/WY/im4MEC/feature_bags_UNI_256um/' 
+BASE_DIR="/hpc2hdd/home/yangwu/WY/SurvPath" 
+STUDY="lihc" 
+MODEL="survpath"
+CUDA_VISIBLE_DEVICES=0 python main-rad_generate.py \
+    --study tcga_${STUDY} --task survival --split_dir splits --which_splits 791_5fold \
+    --modality $MODEL --data_root_dir $DATA_ROOT_DIR --label_file datasets_csv/metadata_all_endpoints/541tcga_${STUDY}.csv \
+    --rad_data_dir '/hpc2hdd/home/yangwu/WY/dl-mri/rad_features_dino.h5' \
+    --results_dir "4.28_byslide_UNI256_FF_sgd_drop0.15" \
+    --batch_size 1 --lr 0.00005 --opt sgd --reg 0.001 \
+    --weighted_sample --max_epochs 10 --encoding_dim 1024 \
+    --label_col class_label --k 5 --bag_loss bce_logits --n_classes 2 --num_patches 1024  --wsi_projection_dim 256
+
+### clinical_features
+DATA_ROOT_DIR='/hpc2hdd/home/yangwu/WY/im4MEC/feature_bags_UNI_256um/' 
+BASE_DIR="/hpc2hdd/home/yangwu/WY/SurvPath" 
+STUDY="lihc" 
+MODEL="survpath"
+CUDA_VISIBLE_DEVICES=0 python main-rad_generate.py \
+    --study tcga_${STUDY} --task survival --split_dir splits --which_splits 791_5fold \
+    --modality $MODEL --data_root_dir $DATA_ROOT_DIR --label_file datasets_csv/metadata_all_endpoints/541tcga_${STUDY}.csv \
+    --rad_data_dir '/hpc2hdd/home/yangwu/WY/dl-mri/rad_features_dino.h5' \
+    --results_dir "4.28_byslide_UNI256_FF_sgd_drop0.15_WSI+RAD" \
+    --batch_size 1 --lr 0.00005 --opt sgd --reg 0.001 \
+    --weighted_sample --max_epochs 10 --encoding_dim 1024 \
+    --label_col class_label --k 5 --bag_loss bce_logits --n_classes 2 --num_patches 2048  --wsi_projection_dim 256
+
+### by_case
+DATA_ROOT_DIR='/hpc2hdd/home/yangwu/WY/im4MEC/feature_bags_UNI_256um/' 
+BASE_DIR="/hpc2hdd/home/yangwu/WY/SurvPath" 
+STUDY="lihc" 
+MODEL="survpath"
+CUDA_VISIBLE_DEVICES=0 python main-rad_fufa.py \
+    --study tcga_${STUDY} --task survival --split_dir splits --which_splits 541_5fold \
+    --modality $MODEL --data_root_dir $DATA_ROOT_DIR --label_file datasets_csv/metadata_all_endpoints/541tcga_${STUDY}.csv \
+    --rad_data_dir '/hpc2hdd/home/yangwu/WY/dl-mri/rad_features_dino.h5' \
+    --results_dir "4.28_UNI256_FF_sgd_drop0.15_ALL" \
+    --batch_size 1 --lr 0.00005 --opt sgd --reg 0.001 \
+    --weighted_sample --max_epochs 10 --encoding_dim 1024 \
+    --label_col class_label --k 5 --bag_loss bce_logits --n_classes 2 --num_patches 2048  --wsi_projection_dim 256
+### 4.30 by slide by case
+DATA_ROOT_DIR='/hpc2hdd/home/yangwu/WY/im4MEC/feature_bags_UNI_256um/' 
+BASE_DIR="/hpc2hdd/home/yangwu/WY/SurvPath" 
+STUDY="lihc" 
+MODEL="survpath"
+CUDA_VISIBLE_DEVICES=0 python main-rad_generate.py \
+    --study tcga_${STUDY} --task survival --split_dir splits --which_splits 791_5fold \
+    --modality $MODEL --data_root_dir $DATA_ROOT_DIR --label_file datasets_csv/metadata_all_endpoints/541tcga_${STUDY}.csv \
+    --rad_data_dir '/hpc2hdd/home/yangwu/WY/dl-mri/rad_features_dino.h5' \
+    --results_dir "4.30_byslideCASE_UNI256_TF_sgd_drop0.15" \
+    --batch_size 1 --lr 0.00005 --opt sgd --reg 0.001 \
+    --weighted_sample --max_epochs 10 --encoding_dim 1024 \
+    --label_col class_label --k 5 --bag_loss bce_logits --n_classes 2 --num_patches 2048  --wsi_projection_dim 256
+5.5cli
+DATA_ROOT_DIR='/hpc2hdd/home/yangwu/WY/im4MEC/feature_bags_UNI_256um/' 
+BASE_DIR="/hpc2hdd/home/yangwu/WY/SurvPath" 
+STUDY="lihc" 
+MODEL="survpath"
+CUDA_VISIBLE_DEVICES=0 python main-rad_generate.py \
+    --study tcga_${STUDY} --task survival --split_dir splits --which_splits 791_5fold \
+    --modality $MODEL --data_root_dir $DATA_ROOT_DIR --label_file datasets_csv/metadata_all_endpoints/541tcga_${STUDY}.csv \
+    --rad_data_dir '/hpc2hdd/home/yangwu/WY/dl-mri/rad_features_dino.h5' \
+    --results_dir "4.30_byslideCASE_UNI256_TF_sgd_drop0.15_wsi+rad" \
+    --batch_size 1 --lr 0.00003 --opt sgd --reg 0.001 \
+    --weighted_sample --max_epochs 10 --encoding_dim 1024 \
+    --label_col class_label --k 5 --bag_loss bce_logits --n_classes 2 --num_patches 2048  --wsi_projection_dim 256
+img_slice=3
+DATA_ROOT_DIR='/hpc2hdd/home/yangwu/WY/im4MEC/feature_bags_UNI_256um/' 
+BASE_DIR="/hpc2hdd/home/yangwu/WY/SurvPath" 
+STUDY="lihc" 
+MODEL="survpath"
+CUDA_VISIBLE_DEVICES=0 python main-rad_generate.py \
+    --study tcga_${STUDY} --task survival --split_dir splits --which_splits 791_5fold \
+    --modality $MODEL --data_root_dir $DATA_ROOT_DIR --label_file datasets_csv/metadata_all_endpoints/541tcga_${STUDY}.csv \
+    --rad_data_dir '/hpc2hdd/home/yangwu/WY/dl-mri/rad_features_dino.h5' \
+    --results_dir "5.5_byslideCASE_UNI256_TF_sgd_drop0.15_wsi+rad3" \
+    --batch_size 1 --lr 0.00003 --opt sgd --reg 0.001 \
+    --weighted_sample --max_epochs 10 --encoding_dim 1024 \
+    --label_col class_label --k 5 --bag_loss bce_logits --n_classes 2 --num_patches 2048  --wsi_projection_dim 256
+
+DATA_ROOT_DIR='/hpc2hdd/home/yangwu/WY/im4MEC/feature_bags_UNI_256um/' 
+BASE_DIR="/hpc2hdd/home/yangwu/WY/SurvPath" 
+STUDY="lihc" 
+MODEL="survpath"
+CUDA_VISIBLE_DEVICES=0 python main-rad_generate.py \
+    --study tcga_${STUDY} --task survival --split_dir splits --which_splits 791_5fold \
+    --modality $MODEL --data_root_dir $DATA_ROOT_DIR --label_file datasets_csv/metadata_all_endpoints/541tcga_${STUDY}.csv \
+    --rad_data_dir '/hpc2hdd/home/yangwu/WY/dl-mri/rad_features_dino.h5' \
+    --results_dir "5.5_byslideCASE_UNI256_TF_sgd_drop0.15_3slice" \
+    --batch_size 1 --lr 0.00003 --opt sgd --reg 0.001 \
+    --weighted_sample --max_epochs 10 --encoding_dim 1024 \
+    --label_col class_label --k 5 --bag_loss bce_logits --n_classes 2 --num_patches 2048  --wsi_projection_dim 256
+
+DATA_ROOT_DIR='/hpc2hdd/home/yangwu/WY/im4MEC/feature_bags_UNI_256um/' 
+BASE_DIR="/hpc2hdd/home/yangwu/WY/SurvPath" 
+STUDY="lihc" 
+MODEL="survpath"
+CUDA_VISIBLE_DEVICES=0 python main-rad_generate.py \
+    --study tcga_${STUDY} --task survival --split_dir splits --which_splits 791_5fold \
+    --modality $MODEL --data_root_dir $DATA_ROOT_DIR --label_file datasets_csv/metadata_all_endpoints/541tcga_${STUDY}.csv \
+    --rad_data_dir '/hpc2hdd/home/yangwu/WY/dl-mri/rad_features_dino.h5' \
+    --results_dir "5.5_byslideCASE_UNI256_TF_sgd_drop0.15_3slice_td" \
+    --batch_size 1 --lr 0.00002 --opt sgd --reg 0.001 \
+    --weighted_sample --max_epochs 10 --encoding_dim 1024 \
+    --label_col class_label --k 5 --bag_loss bce_logits --n_classes 2 --num_patches 2048  --wsi_projection_dim 256
+
+DATA_ROOT_DIR='/hpc2hdd/home/yangwu/WY/im4MEC/feature_bags_UNI_256um/' 
+BASE_DIR="/hpc2hdd/home/yangwu/WY/SurvPath" 
+STUDY="lihc" 
+MODEL="survpath"
+CUDA_VISIBLE_DEVICES=0 python main-rad_generate.py \
+    --study tcga_${STUDY} --task survival --split_dir splits --which_splits 791_5fold \
+    --modality $MODEL --data_root_dir $DATA_ROOT_DIR --label_file datasets_csv/metadata_all_endpoints/541tcga_${STUDY}.csv \
+    --rad_data_dir '/hpc2hdd/home/yangwu/WY/dl-mri/rad_features_dino.h5' \
+    --results_dir "5.5_byslideCASE_UNI256_TF_sgd_drop0.15_td" \
+    --batch_size 1 --lr 0.00002 --opt sgd --reg 0.001 \
+    --weighted_sample --max_epochs 10 --encoding_dim 1024 \
+    --label_col class_label --k 5 --bag_loss bce_logits --n_classes 2 --num_patches 2048  --wsi_projection_dim 256
+coatten 
+DATA_ROOT_DIR='/hpc2hdd/home/yangwu/WY/im4MEC/feature_bags_UNI_256um/' 
+BASE_DIR="/hpc2hdd/home/yangwu/WY/SurvPath" 
+STUDY="lihc" 
+MODEL="survpath"
+CUDA_VISIBLE_DEVICES=0 python main-rad_generate.py \
+    --study tcga_${STUDY} --task survival --split_dir splits --which_splits 791_5fold \
+    --modality $MODEL --data_root_dir $DATA_ROOT_DIR --label_file datasets_csv/metadata_all_endpoints/541tcga_${STUDY}.csv \
+    --rad_data_dir '/hpc2hdd/home/yangwu/WY/dl-mri/rad_features_dino.h5' \
+    --results_dir "5.9_byslideCASE_UNI256_TF_sgd_drop0.15_co_td_2" \
+    --batch_size 1 --lr 0.0001 --opt sgd --reg 0.001 \
+    --weighted_sample --max_epochs 10 --encoding_dim 1024 \
+    --label_col class_label --k 5 --bag_loss bce_logits --n_classes 2 --num_patches 2048  --wsi_projection_dim 256
+
+DATA_ROOT_DIR='/hpc2hdd/home/yangwu/WY/im4MEC/feature_bags_UNI_256um/' 
+BASE_DIR="/hpc2hdd/home/yangwu/WY/SurvPath" 
+STUDY="lihc" 
+MODEL="survpath"
+CUDA_VISIBLE_DEVICES=0 python main-rad_fufa.py \
+    --study tcga_${STUDY} --task survival --split_dir splits --which_splits 541_5fold \
+    --modality $MODEL --data_root_dir $DATA_ROOT_DIR --label_file datasets_csv/metadata_all_endpoints/541tcga_${STUDY}.csv \
+    --rad_data_dir '/hpc2hdd/home/yangwu/WY/dl-mri/rad_features_dino.h5' \
+    --results_dir "5.5_byCASE_UNI256_TF_adam_drop0.15_co_td" \
+    --batch_size 1 --lr 0.0001 --opt adam --reg 0.001 \
+    --weighted_sample --max_epochs 10 --encoding_dim 1024 \
+    --label_col class_label --k 5 --bag_loss bce_logits --n_classes 2 --num_patches 2048  --wsi_projection_dim 256
+
+
+python survpath_heatmap.py \
+--input_slide /hpc2hdd/home/yangwu/WY/svs_rename_10-30/HE/II18-60208-8.svs \
+--output_dir heatmaps5.7 \
+--manifest /hpc2hdd/home/yangwu/WY/im4MEC/label_csv/all791_fold5_418.csv \
+--path_to_clinic_data /hpc2hdd/home/yangwu/WY/SurvPath/datasets_csv/clinical_data/tcga_lihc_clinical.csv \
+--rad_data_dir /hpc2hdd/home/yangwu/WY/dl-mri/output/ \
+--attn_checkpoint /hpc2hdd/home/yangwu/WY/SurvPath/results/5.5_byslideCASE_UNI256_TF_sgd_drop0.15_co_td/tcga_lihc__bce_logits_lr1e-04_791_b1_class_label_dim1_None_dim2_None_patches_2048_wsiDim_256_epochs_10_fusion_None_modality_survpath/s_3_checkpoint.pt \
+--input_feature_size 1024 \
+--tile_size 256 \
+--out_size 224 \
+--display_level 3
+
+### 5.9  logits shape（batch_size,2)
+DATA_ROOT_DIR='/hpc2hdd/home/yangwu/WY/im4MEC/feature_bags_UNI_256um/' 
+BASE_DIR="/hpc2hdd/home/yangwu/WY/SurvPath" 
+STUDY="lihc" 
+MODEL="survpath"
+CUDA_VISIBLE_DEVICES=0 python main-rad_generate.py \
+    --study tcga_${STUDY} --task survival --split_dir splits --which_splits 791_5fold \
+    --modality $MODEL --data_root_dir $DATA_ROOT_DIR --label_file datasets_csv/metadata_all_endpoints/541tcga_${STUDY}.csv \
+    --rad_data_dir '/hpc2hdd/home/yangwu/WY/dl-mri/rad_features_dino.h5' \
+    --results_dir "5.9_byslideCASE_UNI256_TF_sgd_drop0.15_cross_td_2" \
+    --batch_size 1 --lr 0.0001 --opt sgd --reg 0.001 \
+    --weighted_sample --max_epochs 10 --encoding_dim 1024 \
+    --label_col class_label --k 5 --bag_loss bce_logits --n_classes 2 --num_patches 2048  --wsi_projection_dim 256
+
+python survpath_heatmap.py \
+--input_slide /hpc2hdd/home/yangwu/WY/svs_rename_10-30/HE/II18-60208-8.svs \
+--output_dir heatmaps5.7 \
+--manifest /hpc2hdd/home/yangwu/WY/im4MEC/label_csv/all791_fold5_418.csv \
+--path_to_clinic_data /hpc2hdd/home/yangwu/WY/SurvPath/datasets_csv/clinical_data/tcga_lihc_clinical.csv \
+--rad_data_dir /hpc2hdd/home/yangwu/WY/dl-mri/output/ \
+--attn_checkpoint /hpc2hdd/home/yangwu/WY/SurvPath/results/5.9_byslideCASE_UNI256_TF_sgd_drop0.15_co_td_2/tcga_lihc__bce_logits_lr1e-04_791_b1_class_label_dim1_None_dim2_None_patches_2048_wsiDim_256_epochs_10_fusion_None_modality_survpath/s_3_checkpoint.pt \
+--input_feature_size 1024 \
+--tile_size 256 \
+--out_size 224 \
+--display_level 3
+
+### cross_attention
+python survpath_heatmap.py \
+--input_slide /hpc2hdd/home/yangwu/WY/svs_rename_10-30/HE/II18-25439-6-HE.svs \
+--output_dir heatmaps5.10 \
+--manifest /hpc2hdd/home/yangwu/WY/im4MEC/label_csv/all791_fold5_418.csv \
+--path_to_clinic_data /hpc2hdd/home/yangwu/WY/SurvPath/datasets_csv/clinical_data/tcga_lihc_clinical.csv \
+--rad_data_dir /hpc2hdd/home/yangwu/WY/dl-mri/output/ \
+--attn_checkpoint /hpc2hdd/home/yangwu/WY/SurvPath/results/5.9_byslideCASE_UNI256_TF_sgd_drop0.15_cross_td_2/tcga_lihc__bce_logits_lr2e-05_791_b1_class_label_dim1_None_dim2_None_patches_2048_wsiDim_256_epochs_10_fusion_None_modality_survpath/s_3_checkpoint.pt \
+--input_feature_size 1024 \
+--tile_size 256 \
+--out_size 224 \
+--display_level 3
+
+
+### 5.18 
+DATA_ROOT_DIR='/hpc2hdd/home/yangwu/WY/im4MEC/feature_bags_UNI_256um/' 
+BASE_DIR="/hpc2hdd/home/yangwu/WY/SurvPath" 
+STUDY="lihc" 
+MODEL="survpath"
+CUDA_VISIBLE_DEVICES=0 python main-rad_generate.py \
+    --study tcga_${STUDY} --task survival --split_dir splits --which_splits 791_5fold \
+    --modality $MODEL --data_root_dir $DATA_ROOT_DIR --label_file datasets_csv/metadata_all_endpoints/541tcga_${STUDY}.csv \
+    --rad_data_dir '/hpc2hdd/home/yangwu/WY/dl-mri/rad_features_dino.h5' \
+    --results_dir "5.19_byslideCASE_UNI256_TF_sgd_drop0.15_co_td_2" \
+    --batch_size 1 --lr 0.0001 --opt sgd --reg 0.001 \
+    --weighted_sample --max_epochs 10 --encoding_dim 1024 \
+    --label_col class_label --k 5 --bag_loss bce_logits --n_classes 2 --num_patches 2048  --wsi_projection_dim 256
+
+export DATA_ROOT_DIR='/hpc2hdd/home/yangwu/WY/im4MEC/feature_bags_UNI_256um/'
+export BASE_DIR="/hpc2hdd/home/yangwu/WY/SurvPath"
+export STUDY="lihc"
+export MODEL="survpath"
+export CUDA_VISIBLE_DEVICES=0
+nohup python main-rad_generate.py \
+    --study tcga_${STUDY} --task survival --split_dir splits --which_splits 791_5fold \
+    --modality ${MODEL} --data_root_dir ${DATA_ROOT_DIR} --label_file datasets_csv/metadata_all_endpoints/541tcga_${STUDY}.csv \
+    --rad_data_dir '/hpc2hdd/home/yangwu/WY/dl-mri/rad_features_dino.h5' \
+    --results_dir "5.19_byslideCASE_UNI256_TF_sgd_drop0.15_co_td_2" \
+    --batch_size 1 --lr 0.0001 --opt sgd --reg 0.001 \
+    --weighted_sample --max_epochs 10 --encoding_dim 1024 \
+    --label_col class_label --k 5 --bag_loss bce_logits --n_classes 2 --num_patches 2048  --wsi_projection_dim 256 \
+> log_output519.txt 2>&1 &
+
+5.19
+export DATA_ROOT_DIR='/hpc2hdd/home/yangwu/WY/im4MEC/feature_bags_UNI_256um/'
+export BASE_DIR="/hpc2hdd/home/yangwu/WY/SurvPath"
+export STUDY="lihc"
+export MODEL="survpath"
+export CUDA_VISIBLE_DEVICES=0
+nohup python main-rad_generate.py \
+    --study tcga_${STUDY} --task survival --split_dir splits --which_splits 791_5fold \
+    --modality ${MODEL} --data_root_dir ${DATA_ROOT_DIR} --label_file datasets_csv/metadata_all_endpoints/541tcga_${STUDY}.csv \
+    --rad_data_dir '/hpc2hdd/home/yangwu/WY/dl-mri/rad_features_dino.h5' \
+    --results_dir "5.19_byslideCASE_UNI256_TF_sgd_drop0.15_co_td_2_wsi+rad" \
+    --batch_size 1 --lr 0.0001 --opt sgd --reg 0.001 \
+    --weighted_sample --max_epochs 10 --encoding_dim 1024 \
+    --label_col class_label --k 5 --bag_loss bce_logits --n_classes 2 --num_patches 2048  --wsi_projection_dim 256 \
+> log_output519wsi+rad.txt 2>&1 &
+
+5.20
+export DATA_ROOT_DIR='/hpc2hdd/home/yangwu/WY/im4MEC/feature_bags_UNI_256um/'
+export BASE_DIR="/hpc2hdd/home/yangwu/WY/SurvPath"
+export STUDY="lihc"
+export MODEL="survpath"
+export CUDA_VISIBLE_DEVICES=0
+nohup python main-rad_generate.py \
+    --study tcga_${STUDY} --task survival --split_dir splits --which_splits 791_5fold \
+    --modality ${MODEL} --data_root_dir ${DATA_ROOT_DIR} --label_file datasets_csv/metadata_all_endpoints/541tcga_${STUDY}.csv \
+    --rad_data_dir '/hpc2hdd/home/yangwu/WY/dl-mri/rad_features_dino.h5' \
+    --results_dir "5.20_byslideCASE_UNI256_TF_sgd_drop0.15_co_td" \
+    --batch_size 1 --lr 0.0001 --opt sgd --reg 0.001 \
+    --weighted_sample --max_epochs 10 --encoding_dim 1024 \
+    --label_col class_label --k 5 --bag_loss bce_logits --n_classes 2 --num_patches 2048  --wsi_projection_dim 256 \
+> log_output519wsi+rad.txt 2>&1 &
+
+export DATA_ROOT_DIR='/hpc2hdd/home/yangwu/WY/im4MEC/feature_bags_UNI_256um/'
+export BASE_DIR="/hpc2hdd/home/yangwu/WY/SurvPath"
+export STUDY="lihc"
+export MODEL="survpath"
+export CUDA_VISIBLE_DEVICES=0
+nohup python main-rad_generate.py \
+    --study tcga_${STUDY} --task survival --split_dir splits --which_splits 791_5fold \
+    --modality ${MODEL} --data_root_dir ${DATA_ROOT_DIR} --label_file datasets_csv/metadata_all_endpoints/541tcga_${STUDY}.csv \
+    --rad_data_dir '/hpc2hdd/home/yangwu/WY/dl-mri/rad_features_dino.h5' \
+    --results_dir "5.20_byslideCASE_UNI256_TF_sgd_drop0.15_co_td" \
+    --batch_size 1 --lr 0.0001 --opt sgd --reg 0.001 \
+    --weighted_sample --max_epochs 10 --encoding_dim 1024 \
+    --label_col class_label --k 5 --bag_loss bce_logits --n_classes 2 --num_patches 2048  --wsi_projection_dim 256 \
+> log_output520wsi+rad.txt 2>&1 &
+
+### 5.20  
+DATA_ROOT_DIR='/hpc2hdd/home/yangwu/WY/im4MEC/feature_bags_UNI_256um/' 
+BASE_DIR="/hpc2hdd/home/yangwu/WY/SurvPath" 
+STUDY="lihc" 
+MODEL="survpath"
+CUDA_VISIBLE_DEVICES=0 python main-rad_fufa.py \
+    --study tcga_${STUDY} --task survival --split_dir splits --which_splits 541_5fold \
+    --modality $MODEL --data_root_dir $DATA_ROOT_DIR --label_file datasets_csv/metadata_all_endpoints/541tcga_${STUDY}.csv \
+    --rad_data_dir '/hpc2hdd/home/yangwu/WY/dl-mri/rad_features_dino.h5' \
+    --results_dir "5.20_byCASE_UNI256_TF_sgd_drop0.15_CLI_td" \
+    --batch_size 1 --lr 0.0001 --opt sgd --reg 0.001 \
+    --weighted_sample --max_epochs 10 --encoding_dim 1024 \
+    --label_col class_label --k 5 --bag_loss bce_logits --n_classes 2 --num_patches 2048  --wsi_projection_dim 256
+
+### new_label 
+DATA_ROOT_DIR='/hpc2hdd/home/yangwu/WY/im4MEC/feature_bags_UNI_256um/' 
+BASE_DIR="/hpc2hdd/home/yangwu/WY/SurvPath" 
+STUDY="lihc" 
+MODEL="survpath"
+CUDA_VISIBLE_DEVICES=0 python main-rad_generate.py \
+    --study tcga_${STUDY} --task survival --split_dir splits --which_splits 679_5fold \
+    --modality $MODEL --data_root_dir $DATA_ROOT_DIR --label_file datasets_csv/metadata_all_endpoints/462tcga_${STUDY}.csv \
+    --rad_data_dir '/hpc2hdd/home/yangwu/WY/dl-mri/rad_features_dino.h5' \
+    --results_dir "5.21_byslidecase_UNI256_TF_sgd_drop0.15_newlabel" \
+    --batch_size 1 --lr 0.0001 --opt sgd --reg 0.001 \
+    --weighted_sample --max_epochs 10 --encoding_dim 1024 \
+    --label_col class_label --k 5 --bag_loss bce_logits --n_classes 2 --num_patches 2048  --wsi_projection_dim 256
+### 522
+DATA_ROOT_DIR='/hpc2hdd/home/yangwu/WY/im4MEC/feature_bags_UNI_256um/' 
+BASE_DIR="/hpc2hdd/home/yangwu/WY/SurvPath" 
+STUDY="lihc" 
+MODEL="survpath"
+CUDA_VISIBLE_DEVICES=0 python main-rad_fufa.py \
+    --study tcga_${STUDY} --task survival --split_dir splits --which_splits 462_5fold \
+    --modality $MODEL --data_root_dir $DATA_ROOT_DIR --label_file datasets_csv/metadata_all_endpoints/462tcga_${STUDY}.csv \
+    --rad_data_dir '/hpc2hdd/home/yangwu/WY/dl-mri/rad_features_dino.h5' \
+    --results_dir "5.22_bycase_UNI256_TF_adam_newlabel" \
+    --batch_size 1 --lr 0.0001 --opt adam --reg 0.001 \
+    --weighted_sample --max_epochs 10 --encoding_dim 1024 \
+    --label_col class_label --k 5 --bag_loss bce_logits --n_classes 2 --num_patches 2048  --wsi_projection_dim 256
+
+### 5.23  
+DATA_ROOT_DIR='/hpc2hdd/home/yangwu/WY/im4MEC/feature_bags_UNI_256um/' 
+BASE_DIR="/hpc2hdd/home/yangwu/WY/SurvPath" 
+STUDY="lihc" 
+MODEL="survpath"
+CUDA_VISIBLE_DEVICES=0 python main-rad_fufa.py \
+    --study tcga_${STUDY} --task survival --split_dir splits --which_splits 462_5fold \
+    --modality $MODEL --data_root_dir $DATA_ROOT_DIR --label_file datasets_csv/metadata_all_endpoints/462tcga_${STUDY}.csv \
+    --rad_data_dir '/hpc2hdd/home/yangwu/WY/dl-mri/rad_features_dino.h5' \
+    --results_dir "5.23_byCASE_UNI256_TF_adam_drop0.15_CLI_td" \
+    --batch_size 1 --lr 0.0001 --opt adam --reg 0.001 \
+    --weighted_sample --max_epochs 10 --encoding_dim 1024 \
+    --label_col class_label --k 5 --bag_loss bce_logits --n_classes 2 --num_patches 2048  --wsi_projection_dim 256
+
+DATA_ROOT_DIR='/hpc2hdd/home/yangwu/WY/im4MEC/feature_bags_UNI_256um/' 
+BASE_DIR="/hpc2hdd/home/yangwu/WY/SurvPath" 
+STUDY="lihc" 
+MODEL="survpath"
+CUDA_VISIBLE_DEVICES=0 python main-rad_fufa.py \
+    --study tcga_${STUDY} --task survival --split_dir splits --which_splits 462_5fold \
+    --modality $MODEL --data_root_dir $DATA_ROOT_DIR --label_file datasets_csv/metadata_all_endpoints/462tcga_${STUDY}.csv \
+    --rad_data_dir '/hpc2hdd/home/yangwu/WY/dl-mri/rad_features_dino.h5' \
+    --results_dir "5.23_byCASE_UNI256_TF_adam_drop0.15_cross_wsi+rad3_12label" \
+    --batch_size 1 --lr 0.00001 --opt adam --reg 0.001 \
+    --weighted_sample --max_epochs 10 --encoding_dim 1024 \
+    --label_col class_label --k 5 --bag_loss bce_logits --n_classes 2 --num_patches 2048  --wsi_projection_dim 256
+
+#### 528 ### 
+DATA_ROOT_DIR='/hpc2hdd/home/yangwu/WY/im4MEC/feature_bags_UNI_256um/' 
+BASE_DIR="/hpc2hdd/home/yangwu/WY/SurvPath" 
+STUDY="lihc" 
+MODEL="survpath"
+CUDA_VISIBLE_DEVICES=0 python main-rad_fufa.py \
+    --study tcga_${STUDY} --task survival --split_dir splits --which_splits 462_5fold \
+    --modality $MODEL --data_root_dir $DATA_ROOT_DIR --label_file datasets_csv/metadata_all_endpoints/462tcga_${STUDY}.csv \
+    --rad_data_dir '/hpc2hdd/home/yangwu/WY/dl-mri/rad_features_dino.h5' \
+    --results_dir "5.28_462CASE_UNI256_TF_adam_drop0.15_cross_all" \
+    --batch_size 1 --lr 0.00001 --opt adam --reg 0.001 \
+    --weighted_sample --max_epochs 10 --encoding_dim 1024 \
+    --label_col class_label --k 5 --bag_loss bce_logits --n_classes 2 --num_patches 2048  --wsi_projection_dim 256
+
+### resnet50
+DATA_ROOT_DIR='/hpc2hdd/home/yangwu/WY/im4MEC/feature_bags_UNI_256um/' 
+BASE_DIR="/hpc2hdd/home/yangwu/WY/SurvPath" 
+STUDY="lihc" 
+MODEL="survpath"
+CUDA_VISIBLE_DEVICES=0 python main-rad_test.py \
+    --study tcga_${STUDY} --task survival --split_dir splits --which_splits 462_5fold \
+    --modality $MODEL --data_root_dir $DATA_ROOT_DIR --label_file datasets_csv/metadata_all_endpoints/462tcga_${STUDY}.csv \
+    --rad_data_dir '/hpc2hdd/home/yangwu/WY/dl-mri/output/' \
+    --results_dir "5.28_462CASE_UNI256_TF_adam_drop0.15_cross_wsi+rad3_resnet" \
+    --batch_size 1 --lr 0.00001 --opt adam --reg 0.001 \
+    --weighted_sample --max_epochs 10 --encoding_dim 1024 \
+    --label_col class_label --k 5 --bag_loss bce_logits --n_classes 2 --num_patches 2048  --wsi_projection_dim 256
+
+DATA_ROOT_DIR='/hpc2hdd/home/yangwu/WY/im4MEC/feature_bags_UNI_256um/' 
+BASE_DIR="/hpc2hdd/home/yangwu/WY/SurvPath" 
+STUDY="lihc" 
+MODEL="survpath"
+CUDA_VISIBLE_DEVICES=0 python main-rad_test.py \
+    --study tcga_${STUDY} --task survival --split_dir splits --which_splits 541_5fold \
+    --modality $MODEL --data_root_dir $DATA_ROOT_DIR --label_file datasets_csv/metadata_all_endpoints/541tcga_${STUDY}.csv \
+    --rad_data_dir '/hpc2hdd/home/yangwu/WY/dl-mri/output/' \
+    --results_dir "5.29_541CASE_UNI256_TF_adam_drop0.15_cross_wsi+rad3_resnet" \
+    --batch_size 1 --lr 0.00001 --opt adam --reg 0.01 \
+    --weighted_sample --max_epochs 10 --encoding_dim 1024 \
+    --label_col class_label --k 5 --bag_loss bce_logits --n_classes 2 --num_patches 2048  --wsi_projection_dim 256
+
+，resnet pretraintransform mean/
+### 530
+DATA_ROOT_DIR='/hpc2hdd/home/yangwu/WY/im4MEC/feature_bags_UNI_256um/' 
+BASE_DIR="/hpc2hdd/home/yangwu/WY/SurvPath" 
+STUDY="lihc" 
+MODEL="survpath"
+CUDA_VISIBLE_DEVICES=0 python main-rad_fufa.py \
+    --study tcga_${STUDY} --task survival --split_dir splits --which_splits 472_balanced_5fold \
+    --modality $MODEL --data_root_dir $DATA_ROOT_DIR --label_file datasets_csv/metadata_all_endpoints/472tcga_${STUDY}.csv \
+    --rad_data_dir '/hpc2hdd/home/yangwu/WY/dl-mri/rad_features_dino.h5' \
+    --results_dir "5.30_472CASE_UNI256_TF_adam_drop0.15_cross_wsi+rad" \
+    --batch_size 1 --lr 0.00001 --opt adam --reg 0.001 \
+    --weighted_sample --max_epochs 10 --encoding_dim 1024 \
+    --label_col class_label --k 5 --bag_loss bce_logits --n_classes 2 --num_patches 2048  --wsi_projection_dim 256
+
+DATA_ROOT_DIR='/hpc2hdd/home/yangwu/WY/im4MEC/feature_bags_UNI_256um/' 
+BASE_DIR="/hpc2hdd/home/yangwu/WY/SurvPath" 
+STUDY="lihc" 
+MODEL="survpath"
+CUDA_VISIBLE_DEVICES=0 python main-rad_fufa.py \
+    --study tcga_${STUDY} --task survival --split_dir splits --which_splits 472_balanced_5fold \
+    --modality $MODEL --data_root_dir $DATA_ROOT_DIR --label_file datasets_csv/metadata_all_endpoints/472tcga_${STUDY}.csv \
+    --rad_data_dir '/hpc2hdd/home/yangwu/WY/dl-mri/rad_features_dino.h5' \
+    --results_dir "5.30_472CASE_UNI256_TF_adam_drop0.2_cross_wsi+rad" \
+    --batch_size 1 --lr 0.00001 --opt adam --reg 0.001 \
+    --weighted_sample --max_epochs 10 --encoding_dim 1024 \
+    --label_col class_label --k 5 --bag_loss bce_logits --n_classes 2 --num_patches 2048  --wsi_projection_dim 256
+### 462 ？
+DATA_ROOT_DIR='/hpc2hdd/home/yangwu/WY/im4MEC/feature_bags_UNI_256um/' 
+BASE_DIR="/hpc2hdd/home/yangwu/WY/SurvPath" 
+STUDY="lihc" 
+MODEL="survpath"
+CUDA_VISIBLE_DEVICES=0 python main-rad_fufa.py \
+    --study tcga_${STUDY} --task survival --split_dir splits --which_splits 462_5fold \
+    --modality $MODEL --data_root_dir $DATA_ROOT_DIR --label_file datasets_csv/metadata_all_endpoints/462tcga_${STUDY}.csv \
+    --rad_data_dir '/hpc2hdd/home/yangwu/WY/dl-mri/rad_features_dino.h5' \
+    --results_dir "5.30_462CASE_UNI256_TF_adam_drop0.2_cross_wsi+rad" \
+    --batch_size 1 --lr 0.00001 --opt adam --reg 0.001 \
+    --weighted_sample --max_epochs 10 --encoding_dim 1024 \
+    --label_col class_label --k 5 --bag_loss bce_logits --n_classes 2 --num_patches 2048  --wsi_projection_dim 256
+### 5.31
+DATA_ROOT_DIR='/hpc2hdd/home/yangwu/WY/im4MEC/feature_bags_UNI_256um/' 
+BASE_DIR="/hpc2hdd/home/yangwu/WY/SurvPath" 
+STUDY="lihc" 
+MODEL="survpath"
+CUDA_VISIBLE_DEVICES=0 python main-rad_fufa.py \
+    --study tcga_${STUDY} --task survival --split_dir splits --which_splits 541_5fold \
+    --modality $MODEL --data_root_dir $DATA_ROOT_DIR --label_file datasets_csv/metadata_all_endpoints/541tcga_${STUDY}.csv \
+    --rad_data_dir '/hpc2hdd/home/yangwu/WY/dl-mri/rad_features_dino.h5' \
+    --results_dir "5.31_541CASE_UNI256_TF_adam_drop0.2_cross_wsi+rad" \
+    --batch_size 1 --lr 0.00001 --opt adam --reg 0.001 \
+    --weighted_sample --max_epochs 10 --encoding_dim 1024 \
+    --label_col class_label --k 5 --bag_loss bce_logits --n_classes 2 --num_patches 2048  --wsi_projection_dim 256
+
+### 6.3
+DATA_ROOT_DIR='/hpc2hdd/home/yangwu/WY/im4MEC/feature_bags_UNI_256um/' 
+BASE_DIR="/hpc2hdd/home/yangwu/WY/SurvPath" 
+STUDY="lihc" 
+MODEL="survpath"
+CUDA_VISIBLE_DEVICES=0 python main-rad_test.py \
+    --study tcga_${STUDY} --task survival --split_dir splits --which_splits 462_5fold \
+    --modality $MODEL --data_root_dir $DATA_ROOT_DIR --label_file datasets_csv/metadata_all_endpoints/462tcga_${STUDY}.csv \
+    --rad_data_dir '/hpc2hdd/home/yangwu/WY/dl-mri/output/' \
+    --results_dir "6.3_462CASE_UNI256_TF_adam_drop0.15_cross_wsi+rad3_resnet" \
+    --batch_size 1 --lr 0.00001 --opt adam --reg 0.01 \
+    --weighted_sample --max_epochs 10 --encoding_dim 1024 \
+    --label_col class_label --k 5 --bag_loss bce_logits --n_classes 2 --num_patches 2048  --wsi_projection_dim 256
+##### dropout 0.2
+DATA_ROOT_DIR='/hpc2hdd/home/yangwu/WY/im4MEC/feature_bags_UNI_256um/' 
+BASE_DIR="/hpc2hdd/home/yangwu/WY/SurvPath" 
+STUDY="lihc" 
+MODEL="survpath"
+CUDA_VISIBLE_DEVICES=0 python main-rad_test.py \
+    --study tcga_${STUDY} --task survival --split_dir splits --which_splits 462_5fold \
+    --modality $MODEL --data_root_dir $DATA_ROOT_DIR --label_file datasets_csv/metadata_all_endpoints/462tcga_${STUDY}.csv \
+    --rad_data_dir '/hpc2hdd/home/yangwu/WY/dl-mri/output/' \
+    --results_dir "6.3_462CASE_UNI256_TF_adam_drop0.2_cross_wsi+rad3_resnet" \
+    --batch_size 1 --lr 0.00001 --opt adam --reg 0.01 \
+    --weighted_sample --max_epochs 10 --encoding_dim 1024 \
+    --label_col class_label --k 5 --bag_loss bce_logits --n_classes 2 --num_patches 2048  --wsi_projection_dim 256
+### drop_rate 0.2 
+DATA_ROOT_DIR='/hpc2hdd/home/yangwu/WY/im4MEC/feature_bags_UNI_256um/' 
+BASE_DIR="/hpc2hdd/home/yangwu/WY/SurvPath" 
+STUDY="lihc" 
+MODEL="survpath"
+CUDA_VISIBLE_DEVICES=0 python main-rad_test.py \
+    --study tcga_${STUDY} --task survival --split_dir splits --which_splits 462_5fold \
+    --modality $MODEL --data_root_dir $DATA_ROOT_DIR --label_file datasets_csv/metadata_all_endpoints/462tcga_${STUDY}.csv \
+    --rad_data_dir '/hpc2hdd/home/yangwu/WY/dl-mri/output/' \
+    --results_dir "6.4_462CASE_UNI256_TF_adam_drop_rate0.3_cross_wsi+rad3_resnet" \
+    --batch_size 1 --lr 0.00001 --opt adam --reg 0.01 \
+    --weighted_sample --max_epochs 10 --encoding_dim 1024 \
+    --label_col class_label --k 5 --bag_loss bce_logits --n_classes 2 --num_patches 2048  --wsi_projection_dim 256
+
+DATA_ROOT_DIR='/hpc2hdd/home/yangwu/WY/im4MEC/feature_bags_UNI_256um/' 
+BASE_DIR="/hpc2hdd/home/yangwu/WY/SurvPath" 
+STUDY="lihc" 
+MODEL="survpath"
+CUDA_VISIBLE_DEVICES=0 python main-rad_test.py \
+    --study tcga_${STUDY} --task survival --split_dir splits --which_splits 462_5fold \
+    --modality $MODEL --data_root_dir $DATA_ROOT_DIR --label_file datasets_csv/metadata_all_endpoints/462tcga_${STUDY}.csv \
+    --rad_data_dir '/hpc2hdd/home/yangwu/WY/dl-mri/output/' \
+    --results_dir "6.3_462CASE_UNI256_TF_adam_drop_rate0.2_cross_resnet50_ALL" \
+    --batch_size 1 --lr 0.00001 --opt adam --reg 0.01 \
+    --weighted_sample --max_epochs 10 --encoding_dim 1024 \
+    --label_col class_label --k 5 --bag_loss bce_logits --n_classes 2 --num_patches 2048  --wsi_projection_dim 256
+
+export DATA_ROOT_DIR='/hpc2hdd/home/yangwu/WY/im4MEC/feature_bags_UNI_256um/'
+export BASE_DIR="/hpc2hdd/home/yangwu/WY/SurvPath"
+export STUDY="lihc"
+export MODEL="survpath"
+export CUDA_VISIBLE_DEVICES=0
+nohup python main-rad_test.py \
+    --study tcga_${STUDY} --task survival --split_dir splits --which_splits 462_5fold \
+    --modality $MODEL --data_root_dir $DATA_ROOT_DIR --label_file datasets_csv/metadata_all_endpoints/462tcga_${STUDY}.csv \
+    --rad_data_dir '/hpc2hdd/home/yangwu/WY/dl-mri/output/' \
+    --results_dir "6.3_462CASE_UNI256_TF_adam_drop_rate0.2_cross_resnet50_ALLelu" \
+    --batch_size 1 --lr 0.00001 --opt adam --reg 0.01 \
+    --weighted_sample --max_epochs 10 --encoding_dim 1024 \
+    --label_col class_label --k 5 --bag_loss bce_logits --n_classes 2 --num_patches 2048  --wsi_projection_dim 256 \
+> log_output64.txt 2>&1 &
+
+ ## 
+co-attention
+
+
+DATA_ROOT_DIR='/hpc2hdd/home/yangwu/WY/im4MEC/feature_bags_UNI_256um/' 
+BASE_DIR="/hpc2hdd/home/yangwu/WY/SurvPath" 
+STUDY="lihc" 
+MODEL="survpath"
+DIM1=8
+DIM2=16
+STUDIES=("lihc")
+LRS=(0.00005 0.0001 0.0005 0.001)
+DECAYS=(0.00001 0.0001 0.001 0.01)
+for decay in ${DECAYS[@]};
+do
+    for lr in ${LRS[@]};
+    do 
+        for STUDY in ${STUDIES[@]};
+        do
+            CUDA_VISIBLE_DEVICES=0 python main-rad_test.py \
+                --study tcga_${STUDY} --task survival --split_dir splits --which_splits 462_5fold \
+                --modality $MODEL --data_root_dir $DATA_ROOT_DIR --label_file datasets_csv/metadata/462tcga_${STUDY}.csv \
+                --omics_dir datasets_csv/raw_rna_data/${TYPE_OF_PATH}/${STUDY} --results_dir 6.5results_wsi+rad3_5epoch_${STUDY} \
+                --batch_size 1 --lr $lr --opt radam --reg $decay --rad_data_dir '/hpc2hdd/home/yangwu/WY/dl-mri/output/'\
+                --alpha_surv 0.5 --weighted_sample --max_epochs 5 --encoding_dim 1024 \
+                --label_col class_label --k 5 --bag_loss bce_logits --n_classes 2 --num_patches 2048 --wsi_projection_dim 256 \
+                --encoding_layer_1_dim ${DIM1} --encoding_layer_2_dim ${DIM2} --encoder_dropout 0.25
+        done 
+    done
+done 
+
+
+#### 6.6 #### 
+DATA_ROOT_DIR='/hpc2hdd/home/yangwu/WY/im4MEC/feature_bags_UNI_256um/' 
+BASE_DIR="/hpc2hdd/home/yangwu/WY/SurvPath" 
+STUDY="lihc" 
+MODEL="survpath"
+DIM1=8
+DIM2=16
+STUDIES=("lihc")
+LRS=(0.0001)
+DECAYS=(0.001)
+for decay in ${DECAYS[@]};
+do
+    for lr in ${LRS[@]};
+    do 
+        for STUDY in ${STUDIES[@]};
+        do
+            CUDA_VISIBLE_DEVICES=0 python main-rad_test.py \
+                --study tcga_${STUDY} --task survival --split_dir splits --which_splits 462_5fold \
+                --modality $MODEL --data_root_dir $DATA_ROOT_DIR --label_file datasets_csv/metadata/462tcga_${STUDY}.csv \
+                --omics_dir datasets_csv/raw_rna_data/${TYPE_OF_PATH}/${STUDY} --results_dir 6.16best_result_5epoch_${STUDY} \
+                --batch_size 1 --lr $lr --opt radam --reg $decay --rad_data_dir '/hpc2hdd/home/yangwu/WY/dl-mri/output/'\
+                --alpha_surv 0.5 --weighted_sample --max_epochs 5 --encoding_dim 1024 \
+                --label_col class_label --k 5 --bag_loss bce_logits --n_classes 2 --num_patches 2048 --wsi_projection_dim 256 \
+                --encoding_layer_1_dim ${DIM1} --encoding_layer_2_dim ${DIM2} --encoder_dropout 0.25
+        done 
+    done
+done 
+
+#### 6.8 ### 
+DATA_ROOT_DIR='/hpc2hdd/home/yangwu/WY/im4MEC/feature_bags_UNI_256um/' 
+BASE_DIR="/hpc2hdd/home/yangwu/WY/SurvPath" 
+STUDY="lihc" 
+MODEL="survpath"
+DIM1=8
+DIM2=16
+STUDIES=("lihc")
+LRS=(0.0001)
+DECAYS=(0.00001 0.0001 0.001 0.01)
+for decay in ${DECAYS[@]};
+do
+    for lr in ${LRS[@]};
+    do 
+        for STUDY in ${STUDIES[@]};
+        do
+            CUDA_VISIBLE_DEVICES=0 python main-rad_latest.py \
+                --study tcga_${STUDY} --task survival --split_dir splits --which_splits 462_5fold \
+                --modality $MODEL --data_root_dir $DATA_ROOT_DIR --label_file datasets_csv/metadata/462tcga_${STUDY}.csv \
+                --omics_dir datasets_csv/raw_rna_data/${TYPE_OF_PATH}/${STUDY} --results_dir 6.10results_all_new5epoch_${STUDY} \
+                --batch_size 1 --lr $lr --opt radam --reg $decay --rad_data_dir '/hpc2hdd/home/yangwu/WY/dl-mri/output/'\
+                --alpha_surv 0.5 --weighted_sample --max_epochs 5 --encoding_dim 1024 \
+                --label_col class_label --k 5 --bag_loss bce_logits --n_classes 2 --num_patches 2048 --wsi_projection_dim 256 \
+                --encoding_layer_1_dim ${DIM1} --encoding_layer_2_dim ${DIM2} --encoder_dropout 0.25
+        done 
+    done
+done
+
+nohup bash survpath.sh > wsi+rad3_new2epoch.log 2>&1 &
+0.79，lr 10-4  5*10e-5
+nohup bash survpath.sh > all_new2epoch.log 2>&1 &
+
+
+nohup bash survpath.sh > wsi+rad3_new3epoch.log 2>&1 &
+0.74，
+nohup bash survpath.sh > all_new4epoch.log 2>&1 &
+
+nohup bash survpath5.sh > all_best5epoch.log 2>&1 &
+5epoch ；lr: 0.0001 ，reg 10e-4 10e-5
+ 
+
+#### 6.13 cross attention
+
+nohup bash survpath.sh > w+r_co_5epoch.log 2>&1 &
+nohup bash survpath.sh > all_co_5epoch.log 2>&1 &
+，， cross_attender
+
+python grad-cam-fixed.py --model_path '/hpc2hdd/JH_DATA/share/yangwu/yangwu_yangwu_ALL_projects/SurvPath/results/6.4results_5epoch_lihc/1_tcga_lihc__bce_logits_lr1e-04_l2Weight_0.001_462_b1_class_label_dim1_1024_patches_2048_wsiDim_256_epochs_5_fusion_None_modality_survpath/s_0_checkpoint.pt'
+
+nohup bash survpath5.sh > 6.14all_cross_5epoch.log 2>&1 &
+，logits shapen_class;cross_entropy 
+
+nohup bash survpath5.sh > 6.16_w+r10_cross_5epoch.log 2>&1 &
+ lr 0.0001； reg 0.001
+
+all 0.812；w+r 0.792 （ fold）
+model （clinical feature  ， 17→25）（sampleTT,TF)
+
+
+
+#### 6.16 #### 
+DATA_ROOT_DIR='/hpc2hdd/home/yangwu/WY/im4MEC/feature_bags_UNI_256um/' 
+BASE_DIR="/hpc2hdd/home/yangwu/WY/SurvPath" 
+STUDY="lihc" 
+MODEL="survpath"
+DIM1=8
+DIM2=16
+STUDIES=("lihc")
+LRS=(0.0001)
+DECAYS=(0.001)
+for decay in ${DECAYS[@]};
+do
+    for lr in ${LRS[@]};
+    do 
+        for STUDY in ${STUDIES[@]};
+        do
+            CUDA_VISIBLE_DEVICES=0 python main-rad_test.py \
+                --study tcga_${STUDY} --task survival --split_dir splits --which_splits 462_5fold \
+                --modality $MODEL --data_root_dir $DATA_ROOT_DIR --label_file datasets_csv/metadata/462tcga_${STUDY}.csv \
+                --omics_dir datasets_csv/raw_rna_data/${TYPE_OF_PATH}/${STUDY} --results_dir 6.16BCE_result_5epoch_${STUDY} \
+                --batch_size 1 --lr $lr --opt radam --reg $decay --rad_data_dir '/hpc2hdd/home/yangwu/WY/dl-mri/output/'\
+                --alpha_surv 0.5 --weighted_sample --max_epochs 5 --encoding_dim 1024 \
+                --label_col class_label --k 5 --bag_loss cross_entropy --n_classes 2 --num_patches 2048 --wsi_projection_dim 256 \
+                --encoding_layer_1_dim ${DIM1} --encoding_layer_2_dim ${DIM2} --encoder_dropout 0.25
+        done 
+    done
+done
+
+#$###
+dataset_survival_latest_copy clinical
+
+python grad-cam-fixed.py --model_path '/hpc2hdd/JH_DATA/share/yangwu/yangwu_yangwu_ALL_projects/SurvPath/results/6.16best_result_5epoch_lihc/tcga_lihc__bce_logits_lr1e-04_l2Weight_0.001_462_b1_class_label_dim1_1024_patches_2048_wsiDim_256_epochs_5_fusion_None_modality_survpath/s_1_checkpoint.pt'
+
+
+### 618
+nohup bash survpath5.sh > 6.18_all10_cross_2_5epoch.log 2>&1 &
+
+，loss ，
+，，loss，softmax？
+
+
+#### WSI：
+python survpath_WSI_heatmap.py \
+--input_slide /hpc2hdd/home/yangwu/WY/svs_rename_10-30/HE/II18-25439-6-HE.svs \
+--output_dir WSI_heatmap/heatmaps6.18 \
+--manifest /hpc2hdd/JH_DATA/share/yangwu/yangwu_yangwu_ALL_projects/im4MEC/label_csv/462oldlabel.csv \
+--path_to_clinic_data /hpc2hdd/JH_DATA/share/yangwu/yangwu_yangwu_ALL_projects/SurvPath/datasets_csv/clinical_data/tcga_lihc_clinical462.csv \
+--rad_data_dir /hpc2hdd/home/yangwu/WY/dl-mri/output/ \
+--attn_checkpoint /hpc2hdd/JH_DATA/share/yangwu/yangwu_yangwu_ALL_projects/SurvPath/results/6.14_result_all_cross_5epoch_lihc/tcga_lihc__bce_logits_lr1e-04_l2Weight_0.001_462_b1_class_label_dim1_1024_patches_2048_wsiDim_256_epochs_5_fusion_None_modality_survpath/s_0_checkpoint.pt \
+--input_feature_size 1024 \
+--tile_size 256 \
+--out_size 224 \
+--display_level 3 \
+--patch_save_dir /hpc2hdd/JH_DATA/share/yangwu/yangwu_yangwu_ALL_projects/SurvPath/WSI_heatmap/high_attention_patch/
+
+python grad-cam-fixed.py --model_path '/hpc2hdd/JH_DATA/share/yangwu/yangwu_yangwu_ALL_projects/SurvPath/results/6.18_result_all10_cross_2_5epoch_lihc/tcga_lihc__cross_entropy_lr1e-04_l2Weight_0.001_462_b1_class_label_dim1_1024_patches_2048_wsiDim_256_epochs_5_fusion_None_modality_survpath/s_2_checkpoint.pt'
+
+## ：
+python grad-cam-fixed.py --model_path '/hpc2hdd/JH_DATA/share/yangwu/yangwu_yangwu_ALL_projects/SurvPath/results/6.14_result_all_cross_5epoch_lihc/tcga_lihc__bce_logits_lr1e-04_l2Weight_0.001_462_b1_class_label_dim1_1024_patches_2048_wsiDim_256_epochs_5_fusion_None_modality_survpath/s_2_checkpoint.pt'
+
+grad-cam，；WSIMR ，
+，wsi_patch sample（evalsample，）；clinical data()
+
+ img_data；（）
+
+ ： ， slide_idslide/case MR，
+
+#### 619 ### dataset，img_feature,，png；， 0.812 → 0.807
+nohup bash survpath5.sh > 619_all_cross_2_5epoch.log 2>&1 &
+nohup bash survpath.sh > 619_all_cross_1_5epoch.log 2>&1 &
+
+pkill -f python/survpath
+
+##6.23
+python survpath_WSI_heatmap.py \
+--input_slide /hpc2hdd/JH_DATA/share/yangwu/yangwu_yangwu_ALL_projects/svs_rename_10-30/HE/II18-25439-6-HE.svs \
+--output_dir WSI_heatmap/heatmaps6.18 \
+--manifest /hpc2hdd/JH_DATA/share/yangwu/yangwu_yangwu_ALL_projects/im4MEC/label_csv/462oldlabel.csv \
+--path_to_clinic_data /hpc2hdd/JH_DATA/share/yangwu/yangwu_yangwu_ALL_projects/SurvPath/datasets_csv/clinical_data/tcga_lihc_clinical462.csv \
+--rad_data_dir /hpc2hdd/home/yangwu/WY/dl-mri/output/ \
+--attn_checkpoint /hpc2hdd/JH_DATA/share/yangwu/yangwu_yangwu_ALL_projects/SurvPath/results/6.14_result_all_cross_5epoch_lihc/tcga_lihc__bce_logits_lr1e-04_l2Weight_0.001_462_b1_class_label_dim1_1024_patches_2048_wsiDim_256_epochs_5_fusion_None_modality_survpath/s_0_checkpoint.pt \
+--input_feature_size 1024 \
+--tile_size 256 \
+--out_size 224 \
+--display_level 3 \
+--patch_save_dir /hpc2hdd/JH_DATA/share/yangwu/yangwu_yangwu_ALL_projects/SurvPath/WSI_heatmap/high_attention_patch/
+
+dl-mri，img_data
+
+，：
+1.，0.79  0.8， （  heatmap WSI heatmap）
+ ：II19-20842-1   high risk slide，
+，；，
+
+high attention patch
+
+2.grad-cam ，，（ ）；
+，heatmap，
+
+
+### 624  casewsiheatmap topk attention patches；display_level =4
+
+
+python survpath_all_WSI_heatmap.py \
+--input_csv /hpc2hdd/JH_DATA/share/yangwu/yangwu_yangwu_ALL_projects/im4MEC/label_csv/462oldlabel.csv \
+--output_dir WSI_heatmap/heatmaps625 \
+--manifest /hpc2hdd/JH_DATA/share/yangwu/yangwu_yangwu_ALL_projects/im4MEC/label_csv/462oldlabel.csv \
+--path_to_clinic_data /hpc2hdd/JH_DATA/share/yangwu/yangwu_yangwu_ALL_projects/SurvPath/datasets_csv/clinical_data/tcga_lihc_clinical462.csv \
+--rad_data_dir /hpc2hdd/JH_DATA/share/yangwu/yangwu_yangwu_ALL_projects/623/dl-mri/output/ \
+--attn_checkpoint /hpc2hdd/JH_DATA/share/yangwu/yangwu_yangwu_ALL_projects/SurvPath/results/6.14_result_all_cross_5epoch_lihc/tcga_lihc__bce_logits_lr1e-04_l2Weight_0.001_462_b1_class_label_dim1_1024_patches_2048_wsiDim_256_epochs_5_fusion_None_modality_survpath/s_0_checkpoint.pt \
+--input_feature_size 1024 \
+--tile_size 256 \
+--out_size 224 \
+--display_level 5 \
+--patch_save_dir /hpc2hdd/JH_DATA/share/yangwu/yangwu_yangwu_ALL_projects/SurvPath/WSI_heatmap/high_attention_patch/
+
+###  high attention patchsurvpath
+nohup bash get_all_WSI_heatmap.sh > 625_get_all_WSI_heatmap.log 2>&1 &
+
+### 6.27  use_rgb =False ； MR heatmap，
+
+  clinical_data ， grad-cam
+
+
+python grad-cam-fixed.py --model_path '/hpc2hdd/JH_DATA/share/yangwu/yangwu_yangwu_ALL_projects/623/SurvPath/results/6.27_add_result_cross_1_5epoch_lihc/tcga_lihc__bce_logits_lr1e-04_l2Weight_0.001_462_b1_class_label_dim1_1024_patches_2048_wsiDim_256_epochs_5_fusion_None_modality_survpath/s_2_checkpoint.pt'
+
+### 
+DATA_ROOT_DIR='/hpc2hdd/JH_DATA/share/yangwu/yangwu_yangwu_ALL_projects/im4MEC/feature_bags_UNI_256um/' 
+BASE_DIR="/hpc2hdd/home/yangwu/WY/SurvPath" 
+STUDY="lihc" 
+MODEL="survpath"
+DIM1=8
+DIM2=16
+STUDIES=("lihc")
+LRS=(0.0001)
+DECAYS=(0.001)
+for decay in ${DECAYS[@]};
+do
+    for lr in ${LRS[@]};
+    do 
+        for STUDY in ${STUDIES[@]};
+        do
+            CUDA_VISIBLE_DEVICES=0 python main-rad_latest1.py \
+                --study tcga_${STUDY} --task survival --split_dir splits --which_splits 462_5fold \
+                --modality $MODEL --data_root_dir $DATA_ROOT_DIR --label_file datasets_csv/metadata/462tcga_${STUDY}.csv \
+                --omics_dir datasets_csv/raw_rna_data/${TYPE_OF_PATH}/${STUDY} --results_dir 6.27_rep_cross_1_5epoch_${STUDY} \
+                --batch_size 1 --lr $lr --opt radam --reg $decay --rad_data_dir '/hpc2hdd/JH_DATA/share/yangwu/yangwu_yangwu_ALL_projects/dl-mri/output/'\
+                --alpha_surv 0.5 --weighted_sample --max_epochs 5 --encoding_dim 1024 \
+                --label_col class_label --k 5 --bag_loss bce_logits --n_classes 2 --num_patches 2048 --wsi_projection_dim 256 \
+                --encoding_layer_1_dim ${DIM1} --encoding_layer_2_dim ${DIM2} --encoder_dropout 0.25
+        done 
+    done
+done 
+
+7.1
+nohup bash survpath.sh > 7.1survpath.log 2>&1 &
+
+### 7.16 cross attentionMR_EMBEDDING
+
+DATA_ROOT_DIR='/hpc2hdd/JH_DATA/share/yangwu/yangwu_yangwu_ALL_projects/im4MEC/feature_bags_UNI_256um/' 
+BASE_DIR="/hpc2hdd/home/yangwu/WY/SurvPath" 
+STUDY="lihc" 
+MODEL="survpath"
+DIM1=8
+DIM2=16
+STUDIES=("lihc")
+LRS=(0.0001)
+DECAYS=(0.001)
+for decay in ${DECAYS[@]};
+do
+    for lr in ${LRS[@]};
+    do 
+        for STUDY in ${STUDIES[@]};
+        do
+            CUDA_VISIBLE_DEVICES=0 python main-rad_MR.py \
+                --study tcga_${STUDY} --task survival --split_dir splits --which_splits 462_5fold \
+                --modality $MODEL --data_root_dir $DATA_ROOT_DIR --label_file datasets_csv/metadata/462tcga_${STUDY}.csv \
+                --omics_dir datasets_csv/raw_rna_data/${TYPE_OF_PATH}/${STUDY} --results_dir 716_MR_cross_1_5epoch_${STUDY} \
+                --batch_size 1 --lr $lr --opt radam --reg $decay --rad_data_dir '/hpc2hdd/JH_DATA/share/yangwu/yangwu_yangwu_ALL_projects/dl-mri/output/'\
+                --alpha_surv 0.5 --weighted_sample --max_epochs 5 --encoding_dim 1024 \
+                --label_col class_label --k 5 --bag_loss bce_logits --n_classes 2 --num_patches 2048 --wsi_projection_dim 256 \
+                --encoding_layer_1_dim ${DIM1} --encoding_layer_2_dim ${DIM2} --encoder_dropout 0.25
+        done 
+    done
+done
+
+:
+nohup bash survpath5.sh > 7.16MR_survpath5.log 2>&1 &
+clinical embedding128 +MR 128,128
+，
+
+
+7.19：
+462oldlabel.csv ，low，high，sampleshuffle，
+
+DATA_ROOT_DIR='/hpc2hdd/JH_DATA/share/yangwu/yangwu_yangwu_ALL_projects/im4MEC/feature_bags_UNI_256um/' 
+BASE_DIR="/hpc2hdd/home/yangwu/WY/SurvPath" 
+STUDY="lihc" 
+MODEL="survpath"
+DIM1=8
+DIM2=16
+STUDIES=("lihc")
+LRS=(0.0001)
+DECAYS=(0.001)
+for decay in ${DECAYS[@]};
+do
+    for lr in ${LRS[@]};
+    do 
+        for STUDY in ${STUDIES[@]};
+        do
+            CUDA_VISIBLE_DEVICES=0 python main-rad_latest1.py \
+                --study tcga_${STUDY} --task survival --split_dir splits --which_splits 462label \
+                --modality $MODEL --data_root_dir $DATA_ROOT_DIR --label_file datasets_csv/metadata/462tcga_${STUDY}.csv \
+                --omics_dir datasets_csv/raw_rna_data/${TYPE_OF_PATH}/${STUDY} --results_dir 7.19_rep_cross_1_5epoch_${STUDY} \
+                --batch_size 1 --lr $lr --opt radam --reg $decay --rad_data_dir '/hpc2hdd/JH_DATA/share/yangwu/yangwu_yangwu_ALL_projects/dl-mri/output/'\
+                --alpha_surv 0.5 --weighted_sample --max_epochs 5 --encoding_dim 1024 \
+                --label_col class_label --k 5 --bag_loss bce_logits --n_classes 2 --num_patches 2048 --wsi_projection_dim 256 \
+                --encoding_layer_1_dim ${DIM1} --encoding_layer_2_dim ${DIM2} --encoder_dropout 0.25
+        done 
+    done
+done
+
+average validation AUC 0.802;，？（nohupMR_emb）
+val；trainrandomsample；ok、
+
+nohup bash survpath5.sh > 7.19MR_survpath5.log 2>&1 &
+
+DATA_ROOT_DIR='/hpc2hdd/JH_DATA/share/yangwu/yangwu_yangwu_ALL_projects/im4MEC/feature_bags_UNI_256um/' 
+BASE_DIR="/hpc2hdd/home/yangwu/WY/SurvPath" 
+STUDY="lihc" 
+MODEL="survpath"
+DIM1=8
+DIM2=16
+STUDIES=("lihc")
+LRS=(0.0001)
+DECAYS=(0.0001)
+for decay in ${DECAYS[@]};
+do
+    for lr in ${LRS[@]};
+    do 
+        for STUDY in ${STUDIES[@]};
+        do
+            CUDA_VISIBLE_DEVICES=0 python main-ex_test.py \
+                --study tcga_${STUDY} --task survival --split_dir splits --which_splits 146case_5fold \
+                --modality $MODEL --data_root_dir $DATA_ROOT_DIR --label_file datasets_csv/metadata/626tcga_${STUDY}.csv \
+                --omics_dir datasets_csv/raw_rna_data/${TYPE_OF_PATH}/${STUDY} --results_dir 7.22_ex146_test_5epoch_${STUDY} \
+                --batch_size 1 --lr $lr --opt radam --reg $decay --rad_data_dir '/hpc2hdd/JH_DATA/share/yangwu/yangwu_yangwu_ALL_projects/623/dl-mri/output/'\
+                --alpha_surv 0.5 --weighted_sample --max_epochs 5 --encoding_dim 1024 \
+                --label_col class_label --k 5 --bag_loss bce_logits --n_classes 2 --num_patches 2048 --wsi_projection_dim 256 \
+                --encoding_layer_1_dim ${DIM1} --encoding_layer_2_dim ${DIM2} --encoder_dropout 0.25
+        done 
+    done
+done
+
+/hpc2hdd/JH_DATA/share/yangwu/yangwu_yangwu_ALL_projects/623/dl-mri/output/png_images_224_10/N148395_PVP.png
+/hpc2hdd/JH_DATA/share/yangwu/yangwu_yangwu_ALL_projects/dl-mri/output/png_images_224_10/N148395_DP.png
+
+#### 7.22validation
+
+
+nohup bash survpath5.sh > 7.22val_survpath5.log 2>&1 &
+
+nohup bash survpath.sh > 7.22val_wr_survpath.log 2>&1 &
+
+/hpc2hdd/JH_DATA/share/yangwu/yangwu_yangwu_ALL_projects/623/SurvPath/results/7.22_val_wr_cross_1_5epoch_lihc/tcga_lihc__bce_logits_lr1e-04_l2Weight_0.001_462_b1_class_label_dim1_1024_patches_2048_wsiDim_256_epochs_5_fusion_None_modality_survpath
+
+
+nohup bash survpath5.sh > 7.23val_23cli_survpath5.log 2>&1 &
+
+nohup bash survpath5.sh > 7.23val_cross2_23cli_survpath5.log 2>&1 &
+
+nohup bash survpath_wr.sh > 7.23ex_wr_survpath.log 2>&1 &
+
+nohup bash survpath.sh > 7.28_23cli_ex_survpath.log 2>&1 &
+### 
+nohup bash survpath5.sh > 7.28val_23cli_survpath5.log 2>&1 &
+，
+nohup bash survpath_wr.sh > 7.28ex_23cli_survpath5.log 2>&1 &
+
+nohup bash survpath.sh > 7.30_wrc_ex_survpath.log 2>&1 &
+logfold-2
+7.31，survpathtrain+val train+test，，warm upval loss，，train
+
+ WSI+RAD+CLI    WSI+RAD   CLI
+save checkpoint，。
+dataset
+
+DATA_ROOT_DIR='/hpc2hdd/JH_DATA/share/yangwu/yangwu_yangwu_ALL_projects/im4MEC/feature_bags_UNI_256um/' 
+BASE_DIR="/hpc2hdd/home/yangwu/WY/SurvPath" 
+STUDY="lihc" 
+MODEL="survpath"
+DIM1=8
+DIM2=16
+STUDIES=("lihc")
+LRS=(0.0001)
+DECAYS=(0.0001)
+for decay in ${DECAYS[@]};
+do
+    for lr in ${LRS[@]};
+    do 
+        for STUDY in ${STUDIES[@]};
+        do
+            CUDA_VISIBLE_DEVICES=0 python main-ex_test.py \
+                --study tcga_${STUDY} --task survival --split_dir splits --which_splits 146case_5fold \
+                --modality $MODEL --data_root_dir $DATA_ROOT_DIR --label_file datasets_csv/metadata/626tcga_${STUDY}.csv \
+                --omics_dir datasets_csv/raw_rna_data/${TYPE_OF_PATH}/${STUDY} --results_dir 8.5_ex146_test_${STUDY} \
+                --batch_size 1 --lr $lr --opt radam --reg $decay --rad_data_dir '/hpc2hdd/JH_DATA/share/yangwu/yangwu_yangwu_ALL_projects/623/dl-mri/output/'\
+                --alpha_surv 0.5 --weighted_sample --max_epochs 5 --encoding_dim 1024 \
+                --label_col class_label --k 5 --bag_loss bce_logits --n_classes 2 --num_patches 2048 --wsi_projection_dim 256 \
+                --encoding_layer_1_dim ${DIM1} --encoding_layer_2_dim ${DIM2} --encoder_dropout 0.25
+        done 
+    done
+done
+#### ： 0.845!!!
+
+DATA_ROOT_DIR='/hpc2hdd/JH_DATA/share/yangwu/yangwu_yangwu_ALL_projects/im4MEC/feature_bags_UNI_256um/' 
+BASE_DIR="/hpc2hdd/home/yangwu/WY/SurvPath" 
+STUDY="lihc" 
+MODEL="survpath"
+DIM1=8
+DIM2=16
+STUDIES=("lihc")
+LRS=(0.0001)
+DECAYS=(0.0001)
+for decay in ${DECAYS[@]};
+do
+    for lr in ${LRS[@]};
+    do 
+        for STUDY in ${STUDIES[@]};
+        do
+            CUDA_VISIBLE_DEVICES=0 python main-ex_test.py \
+                --study tcga_${STUDY} --task survival --split_dir splits --which_splits 146case_5fold \
+                --modality $MODEL --data_root_dir $DATA_ROOT_DIR --label_file datasets_csv/metadata/608tcga_${STUDY}.csv \
+                --omics_dir datasets_csv/raw_rna_data/${TYPE_OF_PATH}/${STUDY} --results_dir 8.6_ex146_cli_${STUDY} \
+                --batch_size 1 --lr $lr --opt radam --reg $decay --rad_data_dir '/hpc2hdd/JH_DATA/share/yangwu/yangwu_yangwu_ALL_projects/623/dl-mri/output/'\
+                --alpha_surv 0.5 --weighted_sample --max_epochs 5 --encoding_dim 1024 \
+                --label_col class_label --k 5 --bag_loss bce_logits --n_classes 2 --num_patches 2048 --wsi_projection_dim 256 \
+                --encoding_layer_1_dim ${DIM1} --encoding_layer_2_dim ${DIM2} --encoder_dropout 0.25
+        done 
+    done
+done
+0.748  
+
+DATA_ROOT_DIR='/hpc2hdd/JH_DATA/share/yangwu/yangwu_yangwu_ALL_projects/im4MEC/feature_bags_UNI_256um/' 
+BASE_DIR="/hpc2hdd/home/yangwu/WY/SurvPath" 
+STUDY="lihc" 
+MODEL="survpath"
+DIM1=8
+DIM2=16
+STUDIES=("lihc")
+LRS=(0.001)
+DECAYS=(0.001)
+for decay in ${DECAYS[@]};
+do
+    for lr in ${LRS[@]};
+    do 
+        for STUDY in ${STUDIES[@]};
+        do
+            CUDA_VISIBLE_DEVICES=0 python main-rad_latest1.py \
+                --study tcga_${STUDY} --task survival --split_dir splits --which_splits 462_5fold \
+                --modality $MODEL --data_root_dir $DATA_ROOT_DIR --label_file datasets_csv/metadata/462tcga_${STUDY}.csv \
+                --omics_dir datasets_csv/raw_rna_data/${TYPE_OF_PATH}/${STUDY} --results_dir 8.6_val_cli_${STUDY} \
+                --batch_size 1 --lr $lr --opt radam --reg $decay --rad_data_dir '/hpc2hdd/JH_DATA/share/yangwu/yangwu_yangwu_ALL_projects/623/dl-mri/output/'\
+                --alpha_surv 0.5 --weighted_sample --max_epochs 5 --encoding_dim 1024 \
+                --label_col class_label --k 5 --bag_loss bce_logits --n_classes 2 --num_patches 2048 --wsi_projection_dim 256 \
+                --encoding_layer_1_dim ${DIM1} --encoding_layer_2_dim ${DIM2} --encoder_dropout 0.25
+        done 
+    done
+done
+
+### 8.5
+0.875； bootstrap 95% CI ，5fold。。
+，clinical.csv，dataset，
+
+， train——cli，，。
+train 0.803 val auc 0.766
+
+#### 8.13 
+，
+DATA_ROOT_DIR='/hpc2hdd/JH_DATA/share/yangwu/yangwu_yangwu_ALL_projects/im4MEC/feature_bags_UNI_256um/' 
+BASE_DIR="/hpc2hdd/home/yangwu/WY/SurvPath" 
+STUDY="lihc" 
+MODEL="survpath"
+DIM1=8
+DIM2=16
+STUDIES=("lihc")
+LRS=(0.0001)
+DECAYS=(0.0001)
+for decay in ${DECAYS[@]};
+do
+    for lr in ${LRS[@]};
+    do 
+        for STUDY in ${STUDIES[@]};
+        do
+            CUDA_VISIBLE_DEVICES=0 python main-ex_test_wr.py \
+                --study tcga_${STUDY} --task survival --split_dir splits --which_splits 117case_5fold \
+                --modality $MODEL --data_root_dir $DATA_ROOT_DIR --label_file datasets_csv/metadata/608tcga_${STUDY}.csv \
+                --omics_dir datasets_csv/raw_rna_data/${TYPE_OF_PATH}/${STUDY} --results_dir 8.20_ex117_cli_only_${STUDY} \
+                --batch_size 1 --lr $lr --opt radam --reg $decay --rad_data_dir '/hpc2hdd/JH_DATA/share/yangwu/yangwu_yangwu_ALL_projects/623/dl-mri/output/'\
+                --alpha_surv 0.5 --weighted_sample --max_epochs 5 --encoding_dim 1024 \
+                --label_col class_label --k 5 --bag_loss bce_logits --n_classes 2 --num_patches 2048 --wsi_projection_dim 256 \
+                --encoding_layer_1_dim ${DIM1} --encoding_layer_2_dim ${DIM2} --encoder_dropout 0.25
+        done 
+    done
+done
+
+nohup bash survpath5.sh > 8.17_val462_wr.log 2>&1 &
+，train_val 462 case,，w+r w+r+c。
+
+### 8.20  
+117case  w+r，。
+val 0.850  test 0.827  ，   lr 10-e4，decay 0.01
+
+RPC8.5_val_all_lihc 
+val 0.873（），test 0.831   lr 10-e4，decay 0.0001
+
+### 8.21 ### label，label，
+label
+DATA_ROOT_DIR='/hpc2hdd/JH_DATA/share/yangwu/yangwu_yangwu_ALL_projects/im4MEC/feature_bags_UNI_256um/' 
+BASE_DIR="/hpc2hdd/home/yangwu/WY/SurvPath" 
+STUDY="lihc" 
+MODEL="survpath"
+DIM1=8
+DIM2=16
+STUDIES=("lihc")
+LRS=(0.0001 0.0005 0.00005)
+DECAYS=(0.0001 0.001 0.01)
+for decay in ${DECAYS[@]};
+do
+    for lr in ${LRS[@]};
+    do 
+        for STUDY in ${STUDIES[@]};
+        do
+            CUDA_VISIBLE_DEVICES=0 python main-rad_latest1.py \
+                --study tcga_${STUDY} --task survival --split_dir splits --which_splits 462_5fold \
+                --modality $MODEL --data_root_dir $DATA_ROOT_DIR --label_file datasets_csv/metadata/579tcga_${STUDY}.csv \
+                --omics_dir datasets_csv/raw_rna_data/${TYPE_OF_PATH}/${STUDY} --results_dir 8.28_462_test_${STUDY} \
+                --batch_size 1 --lr $lr --opt radam --reg $decay --rad_data_dir '/hpc2hdd/JH_DATA/share/yangwu/yangwu_yangwu_ALL_projects/623/dl-mri/output/'\
+                --alpha_surv 0.5 --weighted_sample --max_epochs 5 --encoding_dim 1024 \
+                --label_col class_label --k 5 --bag_loss bce_logits --n_classes 2 --num_patches 2048 --wsi_projection_dim 256 \
+                --encoding_layer_1_dim ${DIM1} --encoding_layer_2_dim ${DIM2} --encoder_dropout 0.25
+        done 
+    done
+done
+
+ cli_classifier
+
+nohup bash survpath_cli.sh > 8.24_val462_19cli.log 2>&1 &
+
+nohup bash survpath5.sh > 8.25_val462_RPC_19CLI.log 2>&1 &
+
+### 8.25 RPC 19CLI ex_test### 
+
+nohup bash survpath5.sh > 8.25_val462_RPC_19CLI_64.log 2>&1 &
+
+### US+ CLI
+class ClinicNet(nn.Module):
+    def __init__(self):
+        super(ClinicNet, self).__init__()
+        # self.fc_1 = nn.Linear(4, 128)  #
+        # self.fc_2 = nn.Linear(128, 64)
+        # print(self)
+        self.fc_1 = nn.Linear(4, 16)  # !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+        self.fc_2 = nn.Linear(16, 32)
+        # self.fc_3 = nn.Linear(64, 32)
+        # self.fc_4 = nn.Linear(32, class_num)
+        self.relu = nn.ReLU()
+        self.dropout = nn.Dropout(0.1)
+
+DATA_ROOT_DIR='/hpc2hdd/JH_DATA/share/yangwu/yangwu_yangwu_ALL_projects/im4MEC/feature_bags_UNI_256um/' 
+BASE_DIR="/hpc2hdd/home/yangwu/WY/SurvPath" 
+STUDY="lihc" 
+MODEL="survpath"
+DIM1=8
+DIM2=16
+STUDIES=("lihc")
+LRS=(0.02)
+DECAYS=(0.0001)
+for decay in ${DECAYS[@]};
+do
+    for lr in ${LRS[@]};
+    do 
+        for STUDY in ${STUDIES[@]};
+        do
+            CUDA_VISIBLE_DEVICES=0 python main-ex_test_wr.py \
+                --study tcga_${STUDY} --task survival --split_dir splits --which_splits 117case_5fold \
+                --modality $MODEL --data_root_dir $DATA_ROOT_DIR --label_file datasets_csv/metadata/579tcga_${STUDY}.csv \
+                --omics_dir datasets_csv/raw_rna_data/${TYPE_OF_PATH}/${STUDY} --results_dir 9.3_ex117_11cli_${STUDY} \
+                --batch_size 1 --lr $lr --opt radam --reg $decay --rad_data_dir '/hpc2hdd/JH_DATA/share/yangwu/yangwu_yangwu_ALL_projects/623/dl-mri/output/'\
+                --alpha_surv 0.5 --weighted_sample --max_epochs 5 --encoding_dim 1024 \
+                --label_col class_label --k 5 --bag_loss bce_logits --n_classes 2 --num_patches 2048 --wsi_projection_dim 256 \
+                --encoding_layer_1_dim ${DIM1} --encoding_layer_2_dim ${DIM2} --encoder_dropout 0.25
+        done 
+    done
+done
+
+nohup bash survpath_cli.sh > 8.26_val462_11cli.log 2>&1 &
+
+，，
+
+DATA_ROOT_DIR='/hpc2hdd/JH_DATA/share/yangwu/yangwu_yangwu_ALL_projects/im4MEC/feature_bags_UNI_256um/' 
+BASE_DIR="/hpc2hdd/home/yangwu/WY/SurvPath" 
+STUDY="lihc" 
+MODEL="survpath"
+DIM1=8
+DIM2=16
+STUDIES=("lihc")
+LRS=(0.0002)
+DECAYS=(0.01)
+for decay in ${DECAYS[@]};
+do
+    for lr in ${LRS[@]};
+    do 
+        for STUDY in ${STUDIES[@]};
+        do
+            CUDA_VISIBLE_DEVICES=0 python main-ex_test.py \
+                --study tcga_${STUDY} --task survival --split_dir splits --which_splits 117case_5fold \
+                --modality $MODEL --data_root_dir $DATA_ROOT_DIR --label_file datasets_csv/metadata/579tcga_${STUDY}.csv \
+                --omics_dir datasets_csv/raw_rna_data/${TYPE_OF_PATH}/${STUDY} --results_dir 9.5_ex117_19cli_${STUDY} \
+                --batch_size 1 --lr $lr --opt radam --reg $decay --rad_data_dir '/hpc2hdd/JH_DATA/share/yangwu/yangwu_yangwu_ALL_projects/623/dl-mri/output/'\
+                --alpha_surv 0.5 --weighted_sample --max_epochs 5 --encoding_dim 1024 \
+                --label_col class_label --k 5 --bag_loss bce_logits --n_classes 2 --num_patches 2048 --wsi_projection_dim 256 \
+                --encoding_layer_1_dim ${DIM1} --encoding_layer_2_dim ${DIM2} --encoder_dropout 0.25
+        done 
+    done
+done
+
+### ：
+python grad-cam-fixed.py --model_path '/hpc2hdd/JH_DATA/share/yangwu/yangwu_yangwu_ALL_projects/623/SurvPath/results/8.27_462_RPC_ELU128_lihc/tcga_lihc__bce_logits_lr5e-05_l2Weight_0.01_462_b1_class_label_dim1_1024_patches_2048_wsiDim_256_epochs_5_fusion_None_modality_survpath/s_2_checkpoint.pt' 
+model_cp
+MRheatmap
+
+### ，，462case， case
+（，） ++
+
+
+get_all_WSI_heatmap.sh  WSIheatmaptop 8  high attention patch_
+
+
+python grad-cam-fixed.py --model_path '/hpc2hdd/JH_DATA/share/yangwu/yangwu_yangwu_ALL_projects/623/SurvPath/results/8.28_RPC_freeze_lihc/tcga_lihc__bce_logits_lr2e-04_l2Weight_0.001_462_b1_class_label_dim1_1024_patches_2048_wsiDim_256_epochs_5_fusion_None_modality_survpath/s_2_checkpoint.pt'

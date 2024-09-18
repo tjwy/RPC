@@ -1,0 +1,30 @@
+for Converting each WSI into a bag of feature vectors:
+Each WSI in the dataset needs to be converted into a bag of feature vectors using the feature extractor model (UNI).
+The below example command will use the trained feature extraction model to convert each tile in the WSI into a feature vector. All feature vectors of a WSI will be saved together in a 'feature bag' in the .h5 file format. Additionally, a quality control image will be generated in the same output directory so the user can evaluate the quality of the tissue segmentation and tiling. Both output files will be named after the input WSI, suffixed with *_features.h5 and *_features_QC.png, respectively.
+python preprocess_UNI_quick.py \
+--input_dir /WSIs/dir/ \
+--output_dir patch_feature_bags_dir \
+--tile_size 256 \
+--out_size 224 \
+--batch_size 512 \
+--workers 8
+
+
+for training and validation:
+
+for fold in 0 1 2 3 4
+do
+python train_bycase_balance.py \
+--manifest ./label_csv/demo_slide_label.csv \
+--data_dir patch_feature_bags_dir \
+--input_feature_size 1024 \
+--fold ${fold} \
+--result_dir ./result_dir/
+done
+
+for test:
+
+python test_all_cp.py \
+--manifest ./label_csv/external_demo_label.csv \
+--data_dir patch_feature_bags_dir \
+--input_feature_size 1024

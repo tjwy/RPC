@@ -1,0 +1,1957 @@
+conda env create --prefix /hpc2hdd/home/yangwu/.conda/envs/MEC -f environment.yml
+
+conda env create --prefix /hpc2hdd/jovyan/.conda/envs/MEC -f environment.yml
+
+conda install -c conda-forge openslide
+pip install openslide-python
+
+python sample_tiles.py \
+--input_slide /hpc2hdd/home/yangwu/WY/sc_MTOP/SVS/22-34547-2HE.svs \
+--output_dir demo_tiles/240 \
+--tile_size 240 \
+--n 2048 \
+--out_size 224
+
+
+
+#
+
+cat WSI_FILES.txt | xargs -I WSIFILE echo python sample_tiles.py --input_slide=WSIFILE --output_dir=moco_tiles --tile_size=360 --n=2048 --out_size=224 | bash
+
+#cat WSI_FILES.txt | xargs -I WSIFILE echo python tile_all.py --input_slide=WSIFILE --output_dir=moco_tiles --tile_size=360 --n=2048 --out_size=224 | bash
+
+### (）
+python sample_tiles_all.py --input_dir /hpc2hdd/home/yangwu/WY/svs_rename_10-30/HE/ --output_dir=moco_tiles --tile_size 360 --n 2048 --seed 42 --out_size 224
+
+find /hpc2hdd/home/yangwu/WY/im4MEC/moco_tiles/train -name .ipynb_checkpoints -type d -exec rm -r {} +
+#moco
+nohup python moco/main_moco_save.py \
+moco_tiles \
+--lr 0.06 \
+--warmup 10 \
+--epochs 200 \
+--cos \
+--batch-size 288 \
+--arch resnet50 \
+--moco-k 73728 \
+--moco-t 0.07 \
+--mlp \
+--dist-url 'tcp://localhost:10001' \
+--multiprocessing-distributed \
+--world-size 1 \
+--rank 0 &
+
+python moco/main_moco.py \
+moco_tiles \
+--lr 0.06 \
+--warmup 10 \
+--epochs 300 \
+--cos \
+--batch-size 288 \
+--arch resnet50 \
+--moco-k 73728 \
+--moco-t 0.07 \
+--mlp \
+--dist-url 'tcp://localhost:10001' \
+--multiprocessing-distributed \
+--world-size 1 \
+--rank 0
+
+#：，epoch，；34epoch；epoch。。
+
+#slide（）
+python preprocess.py \
+--input_slide /hpc2hdd/home/yangwu/WY/svs_rename_10-30/HE/II18-11621-3.svs \
+--output_dir feature_bags4 \
+--tile_size 360 \
+--out_size 224 \
+--batch_size 256 \
+--checkpoint /hpc2hdd/home/yangwu/WY/im4MEC/model_best-Copy1.pth.tar \
+--backbone resnet50 \
+--workers 6
+
+python preprocess30.py \
+--input_dir /hpc2hdd/home/yangwu/WY/Res_train/TEST/CV/tumor/ \
+--output_dir feature_bags_choose \
+--tile_size 360 \
+--out_size 224 \
+--batch_size 256 \
+--checkpoint /hpc2hdd/home/yangwu/WY/im4MEC/model_best.pth.tar \
+--backbone resnet50 \
+--workers 6
+
+
+
+#slide，，slideslide，，workers=8？（）
+cat WSI_FILES.txt | xargs -I WSIFILE echo python preprocess_ctp.py --input_slide=WSIFILE \
+--output_dir feature_bags_ctp \
+--tile_size 360 \
+--out_size 224 \
+--batch_size 256 \
+--checkpoint /hpc2hdd/home/yangwu/WY/im4MEC/model_best.pth.tar \
+--backbone resnet50 \
+--workers 6 | bash
+
+## 360umpatch resize224pixel，ctp
+## 128umpatch resize224pixel，ctp，h5
+
+cat WSI_FILES.txt | xargs -I WSIFILE echo python preprocess_ctp.py --input_slide=WSIFILE \
+--output_dir feature_bags_ctp_128 \
+--tile_size 128 \
+--out_size 224 \
+--batch_size 512 \
+--workers 48 | bash
+3.21phikon
+cat WSI_FILES.txt | xargs -I WSIFILE echo python preprocess_phikon.py --input_slide=WSIFILE \
+--output_dir feature_bags_phikon \
+--tile_size 112 \
+--out_size 224 \
+--batch_size 128 \
+--workers 8 | bash
+
+
+
+
+cat WSI_FILES_high.txt | tr -d '\r' | xargs -I WSIFILE sh -c 'echo python preprocess_ctp_aug1.py \
+--input_slide=WSIFILE \
+--output_dir feature_bags_aug/aug3 \
+--tile_size 360 \
+--out_size 224 \
+--batch_size 512 \
+--workers 8' | bash
+
+
+
+3#####（gpt，）
+cat WSI_FILES_high.txt | tr -d '\r' | xargs -I WSIFILE sh -c 'echo python preprocess_tumor_aug3.py \
+--input_slide=WSIFILE \
+--output_dir feature_bags_aug/aug3 \
+--tile_size 360 \
+--out_size 224 \
+--batch_size 512 \
+--checkpoint /hpc2hdd/home/yangwu/WY/im4MEC/model_best.pth.tar \
+--backbone resnet50 \
+--workers 8' | bash
+
+#slide（）
+python preprocess_all.py \
+--input_dir /hpc2hdd/home/yangwu/WY/svs_rename_10-30_save/HE/ \
+--output_dir feature_bags \
+--tile_size 360 \
+--out_size 224 \
+--batch_size 256 \
+--checkpoint /hpc2hdd/home/yangwu/WY/im4MEC/checkpoint_0090.pth.tar \
+--backbone resnet50 \
+--workers 1
+#，MECpython，
+Traceback (most recent call last):
+  File "preprocess_all.py", line 539, in <module>
+    pool.map(preprocess, svs_files)  # 
+  File "/hpc2hdd/home/yangwu/.conda/envs/MEC/lib/python3.8/multiprocessing/pool.py", line 364, in map
+    return self._map_async(func, iterable, mapstar, chunksize).get()
+  File "/hpc2hdd/home/yangwu/.conda/envs/MEC/lib/python3.8/multiprocessing/pool.py", line 771, in get
+    raise self._value
+AssertionError: daemonic processes are not allowed to have children
+
+310，torchvisionwarning：
+/hpc2hdd/home/yangwu/.conda/envs/310/lib/python3.10/site-packages/torchvision/models/_utils.py:208: UserWarning: The parameter 'pretrained' is deprecated since 0.13 and may be removed in the future, please use 'weights' instead.
+  warnings.warn(
+/hpc2hdd/home/yangwu/.conda/envs/310/lib/python3.10/site-packages/torchvision/models/_utils.py:223: UserWarning: Arguments other than a weight enum or `None` for 'weights' are deprecated since 0.13 and may be removed in the future. The current behavior is equivalent to passing `weights=None`.
+  warnings.warn(msg)
+  ，。
+  
+##12-11
+
+cat WSI_FILES_f.txt | xargs -I WSIFILE echo python preprocess_tumor.py \
+--input_slide=WSIFILE \
+--output_dir feature_bags_tumor \
+--tile_size 360 \
+--out_size 224 \
+--batch_size 1024 \
+--checkpoint /hpc2hdd/home/yangwu/WY/im4MEC/model_best.pth.tar \
+--backbone resnet50 \
+--workers 32 | bash
+  
+
+#：，，。
+#，csv，test。？
+
+### 12.20
+for fold in 0 1 2 3 4
+do
+python train_hp.py \
+--manifest new_fold5.csv \
+--data_dir feature_bags \
+--input_feature_size 2048 \
+--fold ${fold}
+done
+
+#0
+
+python train.py \
+--manifest new_fold5.csv \
+--data_dir feature_bags \
+--input_feature_size 2048 \
+--full_training 0
+
+
+train、hp，。
+### 2024.2.25：
+for fold in 0 1 2 3 4
+do
+python train.py \
+--manifest ./label_csv/final_fold5.csv \
+--data_dir feature_bags \
+--input_feature_size 2048 \
+--fold ${fold}
+done
+
+， new_fold5.csv = final_fold5.csv
+python train.py \
+--manifest ./label_csv/final_fold5.csv \
+--data_dir feature_bags \
+--input_feature_size 2048 \
+--full_training 0
+
+python test_all_cp.py \
+--manifest ./label_csv/final_test_set.csv \
+--data_dir feature_bags \
+--input_feature_size 2048 
+
+
+python attention.py \
+--input_slide /hpc2hdd/home/yangwu/WY/svs_rename_10-30/HE/II18-25439-6-HE.svs \
+--output_dir heatmaps \
+--manifest labels_old.csv \
+--encoder_checkpoint /hpc2hdd/home/yangwu/WY/im4MEC/model_best.pth.tar \
+--encoder_backbone resnet50 \
+--attn_checkpoint res/1220/full_dataset_small_random_hp0/99_checkpoint.pt \
+--attn_model_size small \
+--input_feature_size 2048 \
+--tile_size 360 \
+--out_size 224 \
+--overlap_factor 1 \
+--display_level 3
+
+
+##loadcheckpoint
+python test_all_cp.py \
+--manifest ./label_csv/final_test_set.csv \
+--data_dir feature_bags \
+--input_feature_size 2048 
+
+
+python eval.py \
+--manifest labels_fold8_aug.csv \
+--data_dir feature_bags_all \
+--input_feature_size 2048 
+
+
+cat WSI_FILES_f.txt | xargs -I WSIFILE echo python preprocess_tumor.py \
+--input_slide=WSIFILE \
+--output_dir feature_bags_tumor \
+--tile_size 360 \
+--out_size 224 \
+--batch_size 1024 \
+--checkpoint /hpc2hdd/home/yangwu/WY/im4MEC/model_best.pth.tar \
+--backbone resnet50 \
+--workers 32 | bash
+
+
+#wsiprobp-score
+python get_p_score.py \
+--manifest labels_old.csv \
+--data_dir feature_bags \
+--input_feature_size 2048
+
+#####
+for fold in 0 1 2 3 4
+do
+python train_focal.py \
+--manifest ./label_csv/fold5_tv-3.csv \
+--data_dir feature_bags_tumor \
+--input_feature_size 2048 \
+--fold ${fold}
+done
+hp； result/tumor
+
+####1-25
+for fold in 0 1 2 3 4
+do
+python train_hp.py \
+--manifest ./label_csv/final_fold5-3.csv \
+--data_dir feature_bags_tumor \
+--input_feature_size 2048 \
+--fold ${fold}
+done
+hpchange 
+
+
+for fold in 0 1 2 3 4
+do
+python train.py \
+--manifest ./label_csv/final_fold5-3.csv \
+--data_dir feature_bags_tumor \
+--input_feature_size 2048 \
+--fold ${fold}
+done
+hp_origin
+
+##
+for fold in 0 1 2 3 4
+do
+python train_hp.py \
+--manifest ./label_csv/final_fold5-3.csv \
+--data_dir feature_bags_tumor \
+--input_feature_size 2048 \
+--fold ${fold}
+done
+
+##
+for fold in 0 1 2 3 4
+do
+python train_hp-Copy1.py \
+--manifest ./label_csv/final_fold5-3.csv \
+--data_dir feature_bags_tumor \
+--input_feature_size 2048 \
+--fold ${fold}
+done
+
+for fold in 0 1 2 3 4
+do
+python train_hp.py \
+--manifest ./label_csv/final_fold5-3.csv \
+--data_dir feature_bags \
+--input_feature_size 2048 \
+--fold ${fold}
+done
+--baseline——tiny
+
+
+for fold in 0 1 2 3 4
+do
+python train_hp-Copy1.py \
+--manifest ./label_csv/final_fold5-3.csv \
+--data_dir feature_bags \
+--input_feature_size 2048 \
+--fold ${fold}
+done
+
+###input_feature_size768
+for fold in 0 1 2 3 4
+do
+python train768.py \
+--manifest ./label_csv/fold5_tv-3.csv \
+--data_dir feature_bags_ctp \
+--input_feature_size 768 \
+--fold ${fold}
+done
+
+
+for fold in 0 1 2 3 4
+do
+python train_hp.py \
+--manifest ./label_csv/final_fold5-3.csv \
+--data_dir feature_bags_tumor \
+--input_feature_size 2048 \
+--fold ${fold}
+done
+
+
+for fold in 0 1 2 3 4
+do
+python train_hp-Copy1.py \
+--manifest ./label_csv/final_fold5-3.csv \
+--data_dir feature_bags_tumor \
+--input_feature_size 2048 \
+--fold ${fold}
+done
+
+
+for fold in 0 1 2 3 4
+do
+python train_opt.py \
+--manifest ./label_csv/final_fold5-3.csv \
+--data_dir feature_bags_tumor \
+--input_feature_size 2048 \
+--fold ${fold}
+done
+
+python train_hp.py \
+--manifest ./label_csv/final_fold5-3.csv \
+--data_dir feature_bags_tumor \
+--input_feature_size 2048 \
+--full_training 0
+
+
+python test.py \
+--manifest ./label_csv/final_test_set.csv \
+--data_dir feature_bags \
+--input_feature_size 2048 
+
+
+for fold in 0 1 2 3 4
+do
+python train_opt.py \
+--manifest ./label_csv/final_fold5-3.csv \
+--data_dir feature_bags_tumor \
+--input_feature_size 2048 \
+--fold ${fold}
+done
+
+###input_feature_size768
+for fold in 0 1 2 3 4
+do
+python train768.py \
+--manifest ./label_csv/ctp_fold5.csv \
+--data_dir feature_bags_ctp \
+--input_feature_size 768 \
+--fold ${fold}
+done
+
+
+### ctp_fold5.csvfinal_fold5-3.csv， II19-05310-14-HE_aug1 II18-50875-7-HE ，。
+
+python train.py \
+--manifest new_fold5.csv \
+--data_dir feature_bags \
+--input_feature_size 2048 \
+--full_training 0
+
+
+
+python train768.py \
+--manifest ./label_csv/ctp_fold5.csv \
+--data_dir feature_bags_ctp \
+--input_feature_size 768 \
+--full_training 1
+
+python test.py \
+--manifest ./label_csv/final_test_set.csv \
+--data_dir feature_bags_ctp \
+--input_feature_size 768 
+
+
+python test_all_cp.py \
+--manifest ./label_csv/final_test_set.csv \
+--data_dir feature_bags_ctp \
+--input_feature_size 768 
+
+python train768.py \
+--manifest ./label_csv/ctp_fold5.csv \
+--data_dir feature_bags_ctp \
+--input_feature_size 768 \
+--full_training 0
+
+python test.py \
+--manifest ./label_csv/final_test_set.csv \
+--data_dir feature_bags_ctp \
+--input_feature_size 768 
+
+for fold in 0 1 2 3 4
+do
+python train768.py \
+--manifest ./label_csv/ctp_fold5.csv \
+--data_dir feature_bags_ctp \
+--input_feature_size 768 \
+--fold ${fold}
+done
+
+python train768.py \
+--manifest ./label_csv/ctp_fold5.csv \
+--data_dir feature_bags_ctp \
+--input_feature_size 768 \
+--full_training 1
+
+python test.py \
+--manifest ./label_csv/final_test_set.csv \
+--data_dir feature_bags_ctp \
+--input_feature_size 768 
+
+python train768.py \
+--manifest ./label_csv/ctp_fold5.csv \
+--data_dir feature_bags_ctp \
+--input_feature_size 768 \
+--full_training 0
+
+python test.py \
+--manifest ./label_csv/final_test_set.csv \
+--data_dir feature_bags_ctp \
+--input_feature_size 768 
+
+python test_all_cp.py \
+--manifest ./label_csv/final_test_set.csv \
+--data_dir feature_bags_ctp \
+--input_feature_size 768 
+(loss_fn）
+for fold in 0 1 2 3 4
+do
+python train768.py \
+--manifest ./label_csv/ctp_fold5.csv \
+--data_dir feature_bags_ctp \
+--input_feature_size 768 \
+--fold ${fold}
+done
+
+python train768.py \
+--manifest ./label_csv/ctp_fold5.csv \
+--data_dir feature_bags_ctp \
+--input_feature_size 768 \
+--full_training 0
+
+python test.py \
+--manifest ./label_csv/final_test_set.csv \
+--data_dir feature_bags_ctp \
+--input_feature_size 768 
+
+
+for fold in 0 1 2 3 4
+do
+python train_bycase.py \
+--manifest ./label_csv/ctp_fold5.csv \
+--data_dir feature_bags \
+--input_feature_size 2048 \
+--fold ${fold}
+done
+
+python train_bycase.py \
+--manifest ./label_csv/final_fold5-3.csv \
+--data_dir feature_bags \
+--input_feature_size 2048 \
+--full_training 0
+
+for fold in 0 1 2 3 4
+do
+python train768_bycase.py \
+--manifest ./label_csv/ctp_fold5.csv \
+--data_dir feature_bags_ctp \
+--input_feature_size 768 \
+--fold ${fold}
+done
+
+python train768_bycase.py \
+--manifest ./label_csv/ctp_fold5.csv \
+--data_dir feature_bags_ctp \
+--input_feature_size 768 \
+--full_training 0
+
+python test_all_cp.py \
+--manifest ./label_csv/final_test_set.csv \
+--data_dir feature_bags_ctp \
+--input_feature_size 768 
+
+2.26 origin hp tumor/ ctp
+for fold in 0 1 2 3 4
+do
+python train.py \
+--manifest ./label_csv/final_fold5-3.csv \
+--data_dir feature_bags_tumor \
+--input_feature_size 2048 \
+--fold ${fold}
+done
+
+tumor_aug_hp_origin
+，tumorvalidation
+
+
+### origin hpctp
+for fold in 0 1 2 3 4
+do
+python train768.py \
+--manifest ./label_csv/ctp_fold5.csv \
+--data_dir feature_bags_ctp \
+--input_feature_size 768 \
+--fold ${fold}
+done
+## hp2，
+python train768.py \
+--manifest ./label_csv/ctp_fold5.csv \
+--data_dir feature_bags_ctp \
+--input_feature_size 768 \
+--full_training 2
+
+python test_all_cp.py \
+--manifest ./label_csv/final_test_set.csv \
+--data_dir feature_bags_ctp \
+--input_feature_size 768 
+，，
+
+model_size 
+for fold in 0 1 2 3 4
+do
+python train_model_size.py \
+--manifest ./label_csv/final_fold5.csv \
+--data_dir feature_bags \
+--input_feature_size 2048 \
+--fold ${fold}
+done
+
+python train_model_size.py \
+--manifest ./label_csv/final_fold5-3.csv \
+--data_dir feature_bags \
+--input_feature_size 2048 \
+--full_training 2
+
+python test_all_cp.py \
+--manifest ./label_csv/final_test_set.csv \
+--data_dir feature_bags \
+--input_feature_size 2048 
+
+python train_model_size.py \
+--manifest ./label_csv/final_fold5-3.csv \
+--data_dir feature_bags \
+--input_feature_size 2048 \
+--full_training 1
+
+python train_model_size.py \
+--manifest ./label_csv/final_fold5-3.csv \
+--data_dir feature_bags \
+--input_feature_size 2048 \
+--full_training 3
+
+## focal_loss
+for fold in 0 1 2 3 4
+do
+python train_model_size_focal.py \
+--manifest ./label_csv/final_fold5-3.csv \
+--data_dir feature_bags \
+--input_feature_size 2048 \
+--fold ${fold}
+done
+### validation focal，
+
+python train_model_size_focal.py \
+--manifest ./label_csv/final_fold5-3.csv \
+--data_dir feature_bags \
+--input_feature_size 2048 \
+--full_training 0
+
+
+### 2.28 aug。，，。
+for fold in 0 1 2 3 4
+do
+python train_model_size_focal.py \
+--manifest ./label_csv/fold5_228.csv \
+--data_dir feature_bags \
+--input_feature_size 2048 \
+--fold ${fold}
+done
+
+2.28model_size_focal
+### ，class，2.28model_size_focal_newfold
+for fold in 0 1 2 3 4 
+do
+python train_model_size_focal.py \
+--manifest ./label_csv/fold5_cv_aug_228.csv \
+--data_dir feature_bags \
+--input_feature_size 2048 \
+--fold ${fold}
+done
+microhp1 full training
+，model
+python train_model_size_focal.py \
+--manifest ./label_csv/fold5_cv_aug_228.csv \
+--data_dir feature_bags \
+--input_feature_size 2048 \
+--full_training 1
+
+python test_all_cp.py \
+--manifest ./label_csv/test_set_228.csv \
+--data_dir feature_bags \
+--input_feature_size 2048 
+
+### 2.28model_size（focal)
+for fold in 1 2 3 4  
+do
+python train_model_size.py \
+--manifest ./label_csv/fold5_cv_aug_228.csv \
+--data_dir feature_bags \
+--input_feature_size 2048 \
+--fold ${fold}
+done
+
+
+### aug  ， ctp128/ctp360/train
+
+### ctp 128，new_fold  2.28ctp_128_newfold  ###  ##，
+for fold in 0 1 2 3 4
+do
+python train768.py \
+--manifest ./label_csv/fold5_cv_228.csv \
+--data_dir feature_bags_ctp_128 \
+--input_feature_size 768 \
+--fold ${fold}
+done
+
+## ctp360 fold，2.28ctp_newfold  ### 
+for fold in 0 1 2 3 4
+do
+python train768.py \
+--manifest ./label_csv/fold5_cv_228.csv \
+--data_dir feature_bags_ctp \
+--input_feature_size 768 \
+--fold ${fold}
+done
+
+
+### 797  ，
+## ctp 360   ### 
+for fold in 0 1 2 3 4   
+do
+python train768.py \
+--manifest ./label_csv/all797_fold5_228.csv \
+--data_dir feature_bags_ctp \
+--input_feature_size 768 \
+--fold ${fold}
+done
+
+for fold in 0 1 2 3 4    ###2
+do
+python train768.py \
+--manifest ./label_csv/all797_fold5_228.csv \
+--data_dir feature_bags_ctp_128 \
+--input_feature_size 768 \
+--fold ${fold}
+done
+
+train 2.28hp_origin,，
+for fold in 0 1 2 3 4   
+do
+python train.py \
+--manifest ./label_csv/all797_fold5_228.csv \
+--data_dir feature_bags \
+--input_feature_size 2048 \
+--fold ${fold}
+done
+
+for fold in 0 1 2 3 4   
+do
+python train_focal.py \
+--manifest ./label_csv/all797_fold5_228.csv \
+--data_dir feature_bags \
+--input_feature_size 2048 \
+--fold ${fold}
+done
+#### 2.28hp_balance
+for fold in 0 1 2 3 4   
+do
+python train_balance.py \
+--manifest ./label_csv/all797_fold5_228.csv \
+--data_dir feature_bags \
+--input_feature_size 2048 \
+--fold ${fold}
+done
+3.18aug balance
+for fold in 0 1 2 3 4   
+do
+python train_balance.py \
+--manifest ./label_csv/fold5_cv_aug_228.csv \
+--data_dir feature_bags \
+--input_feature_size 2048 \
+--fold ${fold}
+done
+
+
+#### ，sample——method,
+for fold in 0 1 2 3 4   
+do
+python train768_balance.py \                             
+--manifest ./label_csv/all797_fold5_228.csv \
+--data_dir feature_bags_ctp \
+--input_feature_size 768 \
+--fold ${fold}
+done
+
+### sample——method
+for fold in 0 1 2 3 4   
+do
+python train768_balance.py \
+--manifest ./label_csv/all797_fold5_228.csv \
+--data_dir feature_bags_ctp_128 \
+--input_feature_size 768 \
+--fold ${fold}
+done
+### 360 balance
+for fold in 0 1 2 3 4   
+do
+python train768_balance.py \
+--manifest ./label_csv/all797_fold5_228.csv \
+--data_dir feature_bags_ctp \
+--input_feature_size 768 \
+--fold ${fold}
+done
+
+###model——size 
+for fold in 0 1 2 3 4  
+do
+python train_model_size.py \
+--manifest ./label_csv/fold5_cv_228.csv \
+--data_dir feature_bags \
+--input_feature_size 2048 \
+--fold ${fold}
+done
+
+for fold in 0 1 2 3 4   
+do
+python train768_balance.py \
+--manifest ./label_csv/all797_fold5_228.csv \
+--data_dir feature_bags_ctp \
+--input_feature_size 768 \
+--fold ${fold}
+done
+
+
+
+### 3.1 bycase
+for fold in 0 1 2 3 4
+do
+python train_bycase.py \
+--manifest ./label_csv/all797_fold5_228.csv \
+--data_dir feature_bags \
+--input_feature_size 2048 \
+--fold ${fold}
+done
+
+### balance
+for fold in 0 1 2 3 4
+do
+python train_bycase.py \
+--manifest ./label_csv/all797_fold5_228.csv \
+--data_dir feature_bags \
+--input_feature_size 2048 \
+--fold ${fold}
+done
+
+for fold in 0 1 2 3 4
+do
+python train_balance.py \
+--manifest ./label_csv/all794_fold5_228.csv \
+--data_dir feature_bags_tumor \
+--input_feature_size 2048 \
+--fold ${fold}
+done
+
+3.25：
+for fold in 0 1 2 3 4
+do
+nohup python train_patch.py \
+--manifest ./label_csv/all797_fold5_228.csv \
+--data_dir /hpc2hdd/JH_DATA/share/feiyuhuang/feiyuhuang_im4/data/feature_bags_patch \
+--input_feature_size 2048 \
+--fold ${fold} > log/add_aug_train_attention_0314.log &
+done
+
+3.26 UNI：
+cat WSI_FILES.txt | xargs -I WSIFILE echo python preprocess_UNI.py \
+--input_slide=WSIFILE \
+--output_dir feature_bags_UNI \
+--tile_size 360 \
+--out_size 224 \
+--batch_size 512 \
+--workers 16 | bash
+
+python preprocess_UNI_quick.py \
+--input_dir /hpc2hdd/home/yangwu/WY/svs_rename_10-30/HE/ \
+--output_dir feature_bags_UNI_256um \
+--tile_size 256 \
+--out_size 224 \
+--batch_size 512 \
+--workers 8 
+
+python preprocess_UNI_quick.py \
+--input_dir /hpc2hdd/home/yangwu/WY/svs_rename_10-30/Ki-67/ \
+--output_dir feature_bags_UNI_Ki-67 \
+--tile_size 256 \
+--out_size 224 \
+--batch_size 1024 \
+--workers 8 
+
+python preprocess_UNI_quick.py \
+--input_dir /hpc2hdd/home/yangwu/WY/svs_rename_10-30/CD34/ \
+--output_dir feature_bags_UNI_CD34 \
+--tile_size 256 \
+--out_size 224 \
+--batch_size 1024 \
+--workers 8
+
+
+for fold in 0 1 2 3 4
+do
+python train.py \
+--manifest labels.csv \
+--data_dir feature_bags \
+--input_feature_size 2048 \
+--fold ${fold}
+done
+
+python preprocess_UNI_quick.py \
+--input_dir /hpc2hdd/home/yangwu/WY/svs_rename_10-30/HE/ \
+--output_dir feature_bags_UNI_128um \
+--tile_size 128 \
+--out_size 224 \
+--batch_size 1024 \
+--workers 8
+
+
+for fold in 0 1 2 3 4
+do
+python train_balance.py \
+--manifest ./label_csv/all794_fold5_228.csv \
+--data_dir feature_bags_UNI_256um \
+--input_feature_size 1024 \
+--fold ${fold}
+done
+ 
+for fold in 0 1 2 3 4
+do
+python train_model_size.py \
+--manifest ./label_csv/all794_fold5_228.csv \
+--data_dir feature_bags_UNI_256um \
+--input_feature_size 1024 \
+--fold ${fold}
+done
+
+for fold in 0 1 2 3 4
+do
+python train_bycase_balance.py \
+--manifest ./label_csv/all794_fold5_228.csv \
+--data_dir feature_bags_UNI_256um \
+--input_feature_size 1024 \
+--fold ${fold}
+done
+
+
+for fold in 0 1 2 3 4
+do
+python train_bycase_balance.py \
+--manifest ./label_csv/all781_fold5.csv \
+--data_dir feature_bags_UNI_256um \
+--input_feature_size 1024 \
+--fold ${fold}
+done
+###3.29
+for fold in 0 1 2 3 4
+do
+python train_bycase_balance.py \
+--manifest ./label_csv/all781_fold5.csv \
+--data_dir feature_bags_UNI \
+--input_feature_size 1024 \
+--fold ${fold}
+done
+
+for fold in 0 1 2 3 4
+do
+python train_balance.py \
+--manifest ./label_csv/all781_fold5.csv \
+--data_dir feature_bags_UNI \
+--input_feature_size 1024 \
+--fold ${fold}
+done
+### 3.31
+for fold in 0 1 2 3 4
+do
+python train_bycase_balance.py \
+--manifest ./label_csv/all781_fold5.csv \
+--data_dir feature_bags_UNI_128um \
+--input_feature_size 1024 \
+--fold ${fold}
+done
+
+
+for fold in 0 1 2 3 4
+do
+python train_balance.py \
+--manifest ./label_csv/all781_fold5.csv \
+--data_dir feature_bags_UNI_128um \
+--input_feature_size 1024 \
+--fold ${fold}
+done
+
+### 4.1
+for fold in 0 1 2 3 4
+do
+python train_bycase_balance_hp.py \
+--manifest ./label_csv/all781_fold5.csv \
+--data_dir feature_bags_UNI \
+--input_feature_size 1024 \
+--fold ${fold}
+done
+
+
+for fold in 0 1 2 3 4
+do
+python train_balance.py \
+--manifest ./label_csv/all797_fold5_228.csv \
+--data_dir feature_bags_UNI_256um \
+--input_feature_size 1024 \
+--fold ${fold}
+done
+
+for fold in 0 1 2 3 4
+do
+python train_balance.py \
+--manifest ./label_csv/all769_fold5.csv \
+--data_dir feature_bags_UNI_256um \
+--input_feature_size 1024 \
+--fold ${fold}
+done
+
+### 4.9
+for fold in 0 1 2 3 4
+do
+python train_bycase_balance_hp.py \
+--manifest ./label_csv/all769_fold5.csv \
+--data_dir feature_bags_UNI_256um \
+--input_feature_size 1024 \
+--fold ${fold}
+done
+
+for fold in 0 1 2 3 4
+do
+python train_bycase_balance.py \
+--manifest ./label_csv/all769_fold5.csv \
+--data_dir feature_bags_UNI_128um \
+--input_feature_size 1024 \
+--fold ${fold}
+done
+
+for fold in 0
+do
+python train_bycase_balance.py \
+--manifest ./label_csv/all769_fold5.csv \
+--data_dir feature_bags_UNI_256um \
+--input_feature_size 1024 \
+--fold ${fold}
+done
+
+
+### 4.11CTP UNI
+for fold in 0 1 2 3 4
+do
+python train_bycase_balance.py \
+--manifest ./label_csv/all769_fold5.csv \
+--data_dir feature_bags_ctp_128 \
+--input_feature_size 768 \
+--fold ${fold}
+done
+
+for fold in 0 1 2 3 4
+do
+python train_bycase_balance.py \
+--manifest ./label_csv/all769_fold5.csv \
+--data_dir feature_bags_ctp_360 \
+--input_feature_size 768 \
+--fold ${fold}
+done
+
+### 4.16fold
+for fold in 0 1 2 3 4
+do
+python train_bycase_balance.py \
+--manifest ./label_csv/all769_fold5_416.csv \
+--data_dir feature_bags_ctp_360 \
+--input_feature_size 768 \
+--fold ${fold}
+done
+
+for fold in 0 1 2 3 4
+do
+python train_bycase_balance.py \
+--manifest ./label_csv/all769_fold5_416.csv \
+--data_dir feature_bags_UNI_360um \
+--input_feature_size 1024 \
+--fold ${fold}
+done
+
+for fold in 0 1 2 3 4
+do
+python train_bycase_balance.py \
+--manifest ./label_csv/all769_fold5_416.csv \
+--data_dir feature_bags_UNI_256um \
+--input_feature_size 1024 \
+--fold ${fold}
+done
+
+for fold in 0 1 2 3 4
+do
+python train_bycase_balance.py \
+--manifest ./label_csv/all769_fold5_416.csv \
+--data_dir feature_bags_UNI_128um \
+--input_feature_size 1024 \
+--fold ${fold}
+done
+
+### ,
+python preprocess_UNI_quick.py \
+--input_dir /hpc2hdd/home/yangwu/WY/svs_rename_10-30/HE/ \
+--output_dir feature_bags_UNI_128um \
+--tile_size 128 \
+--out_size 224 \
+--batch_size 1024 \
+--workers 8
+
+
+
+python preprocess_UNI_quick.py \
+--input_dir /hpc2hdd/JH_DATA/share/yangwu/yangwu_yangwu_ALL_projects/SVS_DATA418/417/ \
+--output_dir feature_bags_NEW_UNI_128um \
+--tile_size 128 \
+--out_size 224 \
+--batch_size 1024 \
+--workers 8
+
+#### 4.18
+for fold in 0 1 2 3 4
+do
+python train_bycase_balance.py \
+--manifest ./label_csv/all791_fold5_418.csv \
+--data_dir feature_bags_UNI_256um \
+--input_feature_size 1024 \
+--fold ${fold}
+done
+
+
+for fold in 0 1 2 3 4
+do
+python train_bycase_balance.py \
+--manifest ./label_csv/all791_fold5_418.csv \
+--data_dir feature_bags_UNI_256um \
+--input_feature_size 1024 \
+--fold ${fold}
+done
+
+for fold in 0 1 2 3 4
+do
+python train_balance.py \
+--manifest ./label_csv/all791_fold5_418.csv \
+--data_dir feature_bags_UNI_256um \
+--input_feature_size 1024 \
+--fold ${fold}
+done
+## 4.21
+
+python preprocess_generate.py \
+--input_dir  /hpc2hdd/home/yangwu/WY/im4MEC/generate/ \
+--output_dir feature_bags_generate_UNI_360um \
+--out_size 224 \
+--batch_size 1024 \
+--workers 8
+
+for fold in 0 1 2 3 4
+do
+python train_balance.py \
+--manifest ./label_csv/all791_fold5_418.csv \
+--data_dir feature_bags_UNI_360um \
+--input_feature_size 1024 \
+--fold ${fold}
+done
+
+for fold in 0 1 2 3 4
+do
+python train_bycase_balance.py \
+--manifest ./label_csv/all791_fold5_418.csv \
+--data_dir feature_bags_UNI_360um \
+--input_feature_size 1024 \
+--fold ${fold}
+done
+
+for fold in 0 1 2 3 4
+do
+python train_bycase_balance.py \
+--manifest ./label_csv/all791_fold5_418.csv \
+--data_dir feature_bags_UNI_128um \
+--input_feature_size 1024 \
+--fold ${fold}
+done
+
+for fold in 0 1 2 3 4
+do
+python train_balance.py \
+--manifest ./label_csv/all791_fold5_418.csv \
+--data_dir feature_bags_UNI_128um \
+--input_feature_size 1024 \
+--fold ${fold}
+done
+
+#### 4.23
+for fold in 0 1 2 3 4
+do
+python train_balance.py \
+--manifest ./label_csv/328case_CD34.csv \
+--data_dir feature_bags_UNI_CD34 \
+--input_feature_size 1024 \
+--fold ${fold}
+done
+
+for fold in 0 1 2 3 4
+do
+python train_bycase_balance.py \
+--manifest ./label_csv/328case_CD34.csv \
+--data_dir feature_bags_UNI_CD34 \
+--input_feature_size 1024 \
+--fold ${fold}
+done
+
+
+
+### 4.24 
+for fold in 3
+do
+python train_bycase_balance.py \
+--manifest ./label_csv/all769_fold3_generate.csv \
+--data_dir feature_bags_UNI_360um \
+--input_feature_size 1024 \
+--fold ${fold}
+done
+####HE+generate  by case 
+
+for fold in 3
+do
+python train_balance.py \
+--manifest ./label_csv/all769_fold5.csv \
+--data_dir feature_bags_UNI_360um \
+--input_feature_size 1024 \
+--fold ${fold}
+done
+
+#### by_slide;by case
+for fold in 3
+do
+python train_slide_case.py \
+--manifest ./label_csv/all769_fold3_generate.csv \
+--data_dir feature_bags_UNI_360um \
+--input_feature_size 1024 \
+--fold ${fold}
+done
+
+for fold in 3
+do
+python train_slide_case.py \
+--manifest ./label_csv/all769_fold5.csv \
+--data_dir feature_bags_UNI_360um \
+--input_feature_size 1024 \
+--fold ${fold}
+done
+
+
+
+#### HE balance ；
+by case balance
+for fold in 3
+do
+python train_bycase_balance.py \
+--manifest ./label_csv/all769_fold3_generate.csv \
+--data_dir feature_bags_UNI_360um \
+--input_feature_size 1024 \
+--fold ${fold}
+done
+
+
+for fold in 3
+do
+python train_model_size.py \
+--manifest ./label_csv/all769_fold3_generate.csv \
+--data_dir feature_bags_UNI_360um \
+--input_feature_size 1024 \
+--fold ${fold}
+done
+
+
+#### 5.7
+
+for fold in 0 1 2 3 4
+do
+python train_slide_case.py \
+--manifest ./label_csv/all791_fold5_418.csv \
+--data_dir feature_bags_UNI_256um \
+--input_feature_size 1024 \
+--fold ${fold}
+done
+
+python train_slide_case.py \
+--manifest ./label_csv/all791_fold5_418.csv \
+--data_dir feature_bags_UNI_256um \
+--input_feature_size 1024 \
+--full_training 2
+
+
+#### heatmap
+python attention_heatmap.py \
+--input_slide /hpc2hdd/home/yangwu/WY/svs_rename_10-30/HE/II18-52077-7-HE.svs \
+--output_dir heatmaps5.7 \
+--manifest ./label_csv/all791_fold5_418.csv \
+--attn_checkpoint result/byslide_case_balance_UNI256/full_dataset_small_balanced_hp0/99_checkpoint.pt \
+--attn_model_size small \
+--input_feature_size 1024 \
+--tile_size 256 \
+--out_size 224 \
+--overlap_factor 1 \
+--display_level 3
+
+$$$ 5.10  KI67：
+python preprocess_generate.py \
+--input_dir  /hpc2hdd/home/yangwu/hesixu/valis/registration_new/ \
+--output_dir feature_bags_UNI_reg67HE \
+--out_size 224 \
+--batch_size 1024 \
+--workers 8
+
+
+python preprocess_UNI_reg.py \
+--input_dir  /hpc2hdd/home/yangwu/hesixu/valis/registration_new/ \
+--output_dir feature_bags_UNI_regHE \
+--tile_size 224 \
+--out_size 224 \
+--batch_size 1024 \
+--workers 8
+
+
+for fold in 0 1 2 3 4
+do
+python train_balance.py \
+--manifest ./label_csv/328case_HE.csv \
+--data_dir feature_bags_UNI_reg67HE \
+--input_feature_size 1024 \
+--fold ${fold}
+done
+
+python inference.py \
+--input_img /hpc2hdd/home/yangwu/WY/im4MEC/CLIP_demo/20240510-140101.jpg \
+--checkpoint /hpc2hdd/home/yangwu/WY/im4MEC/result/byslide_case_balance_UNI256/full_dataset_small_balanced_hp0/99_checkpoint.pt
+--input_feature_size 1024 \
+--tile_size 224 \
+--workers 8
+### 5.16 TIFF，
+for fold in 0 1 2 3 4
+do
+python train_balance.py \
+--manifest ./label_csv/320case_VAL.csv \
+--data_dir feature_bags_UNI_regHE \
+--input_feature_size 1024 \
+--fold ${fold}
+done
+
+for fold in 0 1 2 3 4
+do
+python train_bycase_balance.py \
+--manifest ./label_csv/320case_VAL.csv \
+--data_dir feature_bags_UNI_reg67HE \
+--input_feature_size 1024 \
+--fold ${fold}
+done
+
+### 5.16 UNI preprocess_tumor
+python preprocess_UNI_quick_tumor.py \
+--input_dir /hpc2hdd/home/yangwu/WY/svs_rename_10-30/HE/ \
+--output_dir feature_bags_UNI_256um_tumor \
+--tile_size 256 \
+--out_size 224 \
+--batch_size 512 \
+--workers 8
+
+nohup python preprocess_UNI_quick_tumor.py \
+--input_dir /hpc2hdd/JH_DATA/share/yangwu/yangwu_yangwu_ALL_projects/svs_DATA418/417/ \
+--output_dir feature_bags_UNI_256um_tumor \
+--tile_size 256 \
+--out_size 224 \
+--batch_size 512 \
+--workers 8 > output518.log.txt 2>&1 &
+
+5.19 ：
+
+for fold in 0 1 2 3 4
+do
+nohup python train_slide_case.py \
+--manifest ./label_csv/all791_fold5_418.csv \
+--data_dir feature_bags_UNI_256um_tumor \
+--input_feature_size 1024 \
+--fold ${fold} > 521run.txt 2>&1 &
+done
+
+tensorboard --logdir './result/522_newlabel_bycase_balance_UNI256_hp1'
+
+：
+train AUC PPV NPV sensetivity specivity confusion matrix；AUCROC（/epoch FPR/PPRROC）
+validation AUC PPV NPV sensetivity specivity;confusion matrix；AUCROC
+
+for fold in 0 1 2 3 4
+do
+python train_bycase_balance.py \
+--manifest ./label_csv/all791_fold5_418.csv \
+--data_dir feature_bags_UNI_256um \
+--input_feature_size 1024 \
+--fold ${fold}
+done
+
+### ，nohup
+tensorboard --logdir './result/527_541tumor_bycase_balance_UNI256_hp4'
+
+for fold in 0 1 2 3 4
+do
+python train_bycase_balance.py \
+--manifest ./label_csv/462tcga_lihc.csv \
+--data_dir feature_bags_UNI_256um \
+--input_feature_size 1024 \
+--fold ${fold}
+done
+
+python train_bycase_balance.py \
+--manifest ./label_csv/all791_fold5_418.csv \
+--data_dir feature_bags_UNI_256um \
+--input_feature_size 1024 \
+--full_training 0
+
+
+for fold in 0 1 2 3 4
+do
+python train_bycase_balance.py \
+--manifest ./label_csv/541newlabel.csv \
+--data_dir feature_bags_UNI_256um \
+--input_feature_size 1024 \
+--fold ${fold}
+done
+
+for fold in 0 1 2 3 4
+do
+python train_bycase_balance_hp.py \
+--manifest ./label_csv/462label.csv \
+--data_dir feature_bags_UNI_256um \
+--input_feature_size 1024 \
+--fold ${fold}
+done
+
+### #5.27
+
+## 527
+for fold in 0 1 2 3 4
+do
+python train_bycase_balance.py \
+--manifest ./label_csv/all791_fold5_418.csv \
+--data_dir feature_bags_UNI_256um_tumor \
+--input_feature_size 1024 \
+--fold ${fold}
+done
+
+### 530
+for fold in 0 1 2 3 4
+do
+python train_bycase_balance.py \
+--manifest ./label_csv/695_balanced.csv \
+--data_dir feature_bags_UNI_256um_tumor \
+--input_feature_size 1024 \
+--fold ${fold}
+done
+
+tensorboard --logdir './result/523_oldlabel_bycase_balance_UNI256_hp4'
+
+nohup python preprocess_UNI_quick.py \
+--input_dir /hpc2hdd/JH_DATA/share/yangwu/yangwu_yangwu_ALL_projects/TCGA_data/DATA_ROOT_DIR/tcga_lihc/WSIs/ \
+--output_dir feature_bags_UNI_256um_TCGA_LIHC \
+--tile_size 256 \
+--out_size 224 \
+--batch_size 512 \
+--workers 8 > output531.log.txt 2>&1 &
+
+#### 
+for fold in 0 1 2 3 4
+do
+python train_bycase_balance.py \
+--manifest ./label_csv/462oldlabel.csv \
+--data_dir feature_bags_UNI_256um \
+--input_feature_size 1024 \
+--fold ${fold}
+done
+
+### full training
+python train_bycase_balance.py \
+--manifest ./label_csv/462oldlabel.csv \
+--data_dir feature_bags_UNI_256um \
+--input_feature_size 1024 \
+--full_training 0
+
+full training inference
+inference
+logits  probs 
+
+for fold in 0 1 2 3 4
+do
+python train_balance.py \
+--manifest ./label_csv/462oldlabel.csv \
+--data_dir feature_bags_UNI_256um \
+--input_feature_size 1024 \
+--fold ${fold}
+done
+
+for fold in 0 1 2 3 4
+do
+python train_slide_case.py \
+--manifest ./label_csv/462oldlabel.csv \
+--data_dir feature_bags_UNI_256um \
+--input_feature_size 1024 \
+--fold ${fold}
+done
+
+tensorboard --logdir './result/6.7_462_byslide_balanced_UNI256'
+
+python attention_heatmap.py \
+--input_slide /hpc2hdd/JH_DATA/share/yangwu/yangwu_yangwu_ALL_projects/svs_DATA418/417/II19-20842-1.svs \
+--output_dir heatmaps6.24 \
+--manifest ./label_csv/462oldlabel.csv \
+--attn_checkpoint ./result/63_462_bycase_balance_UNI256_hp4/full_dataset_small_balanced_hp0/99_checkpoint.pt \
+--attn_model_size small \
+--input_feature_size 1024 \
+--tile_size 256 \
+--out_size 224 \
+--overlap_factor 1 \
+--display_level 4
+
+### 2024.7.4
+for fold in 0 1 2 3 4
+do
+python train_wsi+cli.py \
+--manifest ./label_csv/462oldlabel.csv \
+--cli ./label_csv/tcga_lihc_clinical462.csv \
+--data_dir feature_bags_UNI_256um \
+--input_feature_size 1024 \
+--fold ${fold}
+done
+
+tensorboard --logdir './result/7.4_462_wsi+cli_UNI256_hp4'
+
+
+python attention_heatmap.py \
+--input_slide /hpc2hdd/JH_DATA/share/yangwu/yangwu_yangwu_ALL_projects/svs_DATA418/417/II19-20842-1.svs \
+--output_dir heatmaps6.24 \
+--manifest ./label_csv/462oldlabel.csv \
+--attn_checkpoint ./result/63_462_bycase_balance_UNI256_hp4/full_dataset_small_balanced_hp0/99_checkpoint.pt \
+--attn_model_size small \
+--input_feature_size 1024 \
+--tile_size 256 \
+--out_size 224 \
+--overlap_factor 1 \
+--display_level 4
+
+7.11：
+
+python preprocess_UNI_quick.py \
+--input_dir /hpc2hdd/JH_DATA/share/yangwu/yangwu_yangwu_ALL_projects/SYSMH//NEW_SVS_DATA/ \
+--output_dir feature_bags_UNI_256um_711 \
+--tile_size 256 \
+--out_size 224 \
+--batch_size 512 \
+--workers 8
+
+nohup python preprocess_UNI_quick.py \
+--input_dir /hpc2hdd/JH_DATA/share/yangwu/yangwu_yangwu_ALL_projects/svs_DATA418/tif/ \
+--output_dir feature_bags_UNI_256um_718 \
+--tile_size 256 \
+--out_size 224 \
+--batch_size 512 \
+--workers 8 > output711.log.txt 2>&1 &
+caseslides，。。
+，slide_id list
+
+### case_label csv，
+for fold in 0 1 2 3 4
+do
+python train_bycase_balance.py \
+--manifest ./label_csv/679slide_label.csv \
+--data_dir feature_bags_UNI_256um \
+--input_feature_size 1024 \
+--fold ${fold}
+done
+
+tensorboard --logdir './result/719_462_bycase_balance_UNI256_hp4'
+
+
+###7.21    196tifs
+nohup python preprocess_UNI_quick.py \
+--input_dir /hpc2hdd/JH_DATA/share/czhangcn/czhangcn_MDI/wuyang/wsi/ \
+--output_dir feature_bags_UNI_256um_721 \
+--tile_size 256 \
+--out_size 224 \
+--batch_size 512 \
+--workers 8 > output721.log.txt 2>&1 &
+
+7.21 full_training
+
+python train_bycase_balance.py \
+--manifest ./label_csv/679slide_label.csv \
+--data_dir feature_bags_UNI_256um \
+--input_feature_size 1024 \
+--full_training 0
+
+python test_all_cp.py \
+--manifest ./label_csv/79+27+58.csv \
+--data_dir feature_bags_UNI_256um \
+--input_feature_size 1024
+test by slide， by case
+
+ 0.678
+F1 Score: 0.5019607843137255
+AUC: 0.6784385519399988
+Accuracy: 0.6864197530864198
+Recall: 0.5423728813559322
+Precision: 0.46715328467153283
+Confusion Matrix: 
+[[214  73]
+ [ 54  64]]
+
+### test_all_cp.py by Case
+F1 Score: 0.5225225225225225
+AUC: 0.6743728480078701
+Accuracy: 0.676829268292683
+Recall: 0.5087719298245614
+Precision: 0.5370370370370371
+Confusion Matrix: 
+[[82 25]
+ [28 29]]
+
+
+python test_all_cp.py \
+--manifest ./label_csv/155case.csv \
+--data_dir feature_bags_UNI_256um \
+--input_feature_size 1024
+test by slide， by case
+
+155case
+F1 Score: 0.5523809523809524
+AUC: 0.6925388967468176
+Accuracy: 0.7006369426751592
+Recall: 0.5178571428571429
+Precision: 0.5918367346938775
+Confusion Matrix: 
+[[81 20]
+ [27 29]]
+Finished testing.
+
+python test_all_cp.py \
+--manifest ./label_csv/142case.csv \
+--data_dir feature_bags_UNI_256um \
+--input_feature_size 1024
+F1 Score: 0.6363636363636364
+AUC: 0.7855835240274598
+Accuracy: 0.7730496453900709
+Recall: 0.6086956521739131
+Precision: 0.6666666666666666
+Confusion Matrix: 
+[[81 14]
+ [18 28]]
+
+
+ ### 7.22
+python test_all_cp.py \
+--manifest ./label_csv/146case.csv \
+--data_dir feature_bags_UNI_256um \
+--input_feature_size 1024
+
+F1 Score: 0.6021505376344086
+AUC: 0.7491489361702127
+Accuracy: 0.7430555555555556
+Recall: 0.56
+Precision: 0.6511627906976745
+Confusion Matrix: 
+[[79 15]
+ [22 28]]
+
+
+for fold in 0 1 2 3 4
+do
+python train_bycase_balance.py \
+--manifest ./label_csv/679slide_label.csv \
+--data_dir feature_bags_UNI_256um \
+--input_feature_size 1024 \
+--fold ${fold}
+done
+5foldfold
+：
+ ### 7.22
+python test_all_cp.py \
+--manifest ./label_csv/146case.csv \
+--data_dir feature_bags_UNI_256um \
+--input_feature_size 1024
+
+=> Testing on 146 samples
+Testing model on testing set...
+Found 5 checkpoint files.
+Model: /hpc2hdd/JH_DATA/share/yangwu/yangwu_yangwu_ALL_projects/im4MEC/result/723_462_bycase_balance_UNI256_hp4/fold_1_small_balanced_hp0/checkpoint_epoch_34.pt
+F1 Score: 0.6796116504854369
+AUC: 0.7886480908152735
+Accuracy: 0.773972602739726
+Recall: 0.6862745098039216
+Precision: 0.6730769230769231
+Confusion Matrix: 
+[[78 17]
+ [16 35]]
+Finished testing.
+Model: /hpc2hdd/JH_DATA/share/yangwu/yangwu_yangwu_ALL_projects/im4MEC/result/723_462_bycase_balance_UNI256_hp4/fold_0_small_balanced_hp0/checkpoint_epoch_99.pt
+F1 Score: 0.6666666666666666
+AUC: 0.7816305469556243
+Accuracy: 0.7534246575342466
+Recall: 0.7058823529411765
+Precision: 0.631578947368421
+Confusion Matrix: 
+[[74 21]
+ [15 36]]
+Finished testing.
+Model: /hpc2hdd/JH_DATA/share/yangwu/yangwu_yangwu_ALL_projects/im4MEC/result/723_462_bycase_balance_UNI256_hp4/fold_4_small_balanced_hp0/checkpoint_epoch_44.pt
+F1 Score: 0.5806451612903226
+AUC: 0.7519091847265221
+Accuracy: 0.7328767123287672
+Recall: 0.5294117647058824
+Precision: 0.6428571428571429
+Confusion Matrix: 
+[[80 15]
+ [24 27]]
+Finished testing.
+Model: /hpc2hdd/JH_DATA/share/yangwu/yangwu_yangwu_ALL_projects/im4MEC/result/723_462_bycase_balance_UNI256_hp4/fold_3_small_balanced_hp0/checkpoint_epoch_33.pt
+F1 Score: 0.5217391304347826
+AUC: 0.7139318885448916
+Accuracy: 0.6986301369863014
+Recall: 0.47058823529411764
+Precision: 0.5853658536585366
+Confusion Matrix: 
+[[78 17]
+ [27 24]]
+Finished testing.
+Model: /hpc2hdd/JH_DATA/share/yangwu/yangwu_yangwu_ALL_projects/im4MEC/result/723_462_bycase_balance_UNI256_hp4/fold_2_small_balanced_hp0/checkpoint_epoch_33.pt
+F1 Score: 0.5714285714285714
+AUC: 0.768421052631579
+Accuracy: 0.7123287671232876
+Recall: 0.5490196078431373
+Precision: 0.5957446808510638
+Confusion Matrix: 
+[[76 19]
+ [23 28]]
+Finished testing.
+
+#### 7.28
+for fold in 0 1 2 3 4
+do
+python train_wsi+cli.py \
+--manifest ./label_csv/679slide_label.csv \
+--cli ./label_csv/tcga_lihc_clinical608.csv \
+--data_dir feature_bags_UNI_256um \
+--input_feature_size 1024 \
+--fold ${fold}
+done
+
+### 7.28_462_wsi+cli_UNI256_hp4
+python test_all_cp_wsi_cli.py \
+--manifest ./label_csv/146case.csv \
+--cli ./label_csv/tcga_lihc_clinical608.csv \
+--data_dir feature_bags_UNI_256um \
+--input_feature_size 1024
+
+tensorboard --logdir './result/7.28_462_wsi+cli_UNI256_hp4'
+
+
+Model: /hpc2hdd/JH_DATA/share/yangwu/yangwu_yangwu_ALL_projects/im4MEC/result/7.28_462_wsi+cli_UNI256_hp4/fold_2_small_balanced_hp0/checkpoint_epoch_32.pt
+F1 Score: 0.5217391304347826
+AUC: 0.7327141382868938
+Accuracy: 0.6986301369863014
+Recall: 0.47058823529411764
+Precision: 0.5853658536585366
+Confusion Matrix: 
+[[78 17]
+ [27 24]]
+Finished testing
+
+tensorboard --logdir './result/7.28_462_wsi+cli_UNI256_hp4_new'
+average 0.7612
+
+
+for fold in 0 1 2 3 4
+do
+python train_wsi+cli.py \
+--manifest ./label_csv/679slide_label.csv \
+--cli ./label_csv/tcga_lihc_clinical608.csv \
+--data_dir feature_bags_UNI_256um \
+--input_feature_size 1024 \
+--fold ${fold}
+done
+
+tensorboard --logdir './result/7.29_462_wsi+cli_UNI256_hp4_new'
+
+tensorboard --logdir './result/7.28_462_wsi+cli_UNI256_hp4'
+
+python test_all_cp_wsi_cli.py \
+--manifest ./label_csv/146case.csv \
+--cli ./label_csv/tcga_lihc_clinical608.csv \
+--data_dir feature_bags_UNI_256um \
+--input_feature_size 1024
+
+
+for fold in 0 1 2 3 4
+do
+python train_wsi+cli.py \
+--manifest ./label_csv/679slide_label.csv \
+--cli ./label_csv/tcga_lihc_clinical608.csv \
+--data_dir feature_bags_UNI_256um \
+--input_feature_size 1024 \
+--fold ${fold}
+done
+tensorboard --logdir './result/7.30_462_wsi+cli128dim_UNI256'
+：
+Model: /hpc2hdd/JH_DATA/share/yangwu/yangwu_yangwu_ALL_projects/im4MEC/result/7.30_test_462_wsi+cli_UNI256_hp4_new/fold_2_micro_balanced_hp1/checkpoint_epoch_34.pt
+F1 Score: 0.6470588235294118
+AUC: 0.805985552115583
+Accuracy: 0.7534246575342466
+Recall: 0.6470588235294118
+Precision: 0.6470588235294118
+Confusion Matrix: 
+[[77 18]
+ [18 33]]
+Finished testing.
+
+### 7.30,smallwsI+cli，micro
+for fold in 0 1 2 3 4
+do
+python train_bycase_balance.py \
+--manifest ./label_csv/679slide_label.csv \
+--data_dir feature_bags_UNI_256um \
+--input_feature_size 1024 \
+--fold ${fold}
+done
+micro，checkpoint
+
+python test_all_cp.py \
+--manifest ./label_csv/146case.csv \
+--data_dir feature_bags_UNI_256um \
+--input_feature_size 1024
+：（small）
+Model: /hpc2hdd/JH_DATA/share/yangwu/yangwu_yangwu_ALL_projects/im4MEC/result/730_micro_462_bycase_balance_UNI256_hp4/fold_2_micro_balanced_hp0/checkpoint_epoch_33.pt
+F1 Score: 0.5714285714285714
+AUC: 0.7659442724458204
+Accuracy: 0.7123287671232876
+Recall: 0.5490196078431373
+Precision: 0.5957446808510638
+Confusion Matrix: 
+[[76 19]
+ [23 28]]
+
+
+model，tensorboard
+tensorboard --logdir './result/85_small_462_bycase_balance_UNI256'
+test：
+Model: /hpc2hdd/JH_DATA/share/yangwu/yangwu_yangwu_ALL_projects/im4MEC/result/7.30_462_wsi+cli128dim_UNI256/fold_2_small_balanced_hp0/checkpoint_epoch_34.pt
+F1 Score: 0.5918367346938775
+AUC: 0.7312693498452012
+Accuracy: 0.726027397260274
+Recall: 0.5686274509803921
+Precision: 0.6170212765957447
+Confusion Matrix: 
+[[77 18]
+ [22 29]]
+
+cli dim512，dropout 0.25
+fold3 0.861  average 0.789
+ex+test:
+Model: /hpc2hdd/JH_DATA/share/yangwu/yangwu_yangwu_ALL_projects/im4MEC/result/7.30_462_wsi+cli512dim_UNI256/fold_2_small_balanced_hp0/checkpoint_epoch_34.pt
+F1 Score: 0.6476190476190476
+AUC: 0.7933952528379773
+Accuracy: 0.7465753424657534
+Recall: 0.6666666666666666
+Precision: 0.6296296296296297
+Confusion Matrix: 
+[[75 20]
+ [17 34]]
+
+for fold in 0 1 2 3 4
+do
+python train_bycase_balance.py \
+--manifest ./label_csv/679slide_label.csv \
+--data_dir feature_bags_UNI_256um \
+--input_feature_size 1024 \
+--fold ${fold}
+done
+
+for fold in 0 1 2 3 4
+do
+python train_wsi+cli.py \
+--manifest ./label_csv/679slide_label.csv \
+--cli ./label_csv/tcga_lihc_clinical608.csv \
+--data_dir feature_bags_UNI_256um \
+--input_feature_size 1024 \
+--fold ${fold}
+done
+
+tensorboard --logdir './result/8.5_462_wsi+cli512dim_UNI256'
+
+，AUC ACC val
+python test_all_cp.py \
+--manifest ./label_csv/146case.csv \
+--data_dir feature_bags_UNI_256um \
+--input_feature_size 1024
+
+python test_all_cp_wsi_cli.py \
+--manifest ./label_csv/146case.csv \
+--cli ./label_csv/tcga_lihc_clinical608.csv \
+--data_dir feature_bags_UNI_256um \
+--input_feature_size 1024
+
+python test_all_cp.py \
+--manifest ./label_csv/120case.csv \
+--data_dir feature_bags_UNI_256um \
+--input_feature_size 1024
+
+### 2024-8-13:
+F1 Score: 0.5396825396825397
+AUC: 0.7996814018319395
+Accuracy: 0.7583333333333333
+Recall: 0.6296296296296297
+Precision: 0.4722222222222222
+Confusion Matrix: 
+[[74 19]
+ [10 17]]
+
+python test_all_cp.py \
+--manifest ./label_csv/117case.csv \
+--data_dir feature_bags_UNI_256um \
+--input_feature_size 1024
+
+0.805 (117case,small_model)
+
+python test_all_cp_wsi_cli.py \
+--manifest ./label_csv/117case.csv \
+--cli ./label_csv/tcga_lihc_clinical582.csv \
+--data_dir feature_bags_UNI_256um \
+--input_feature_size 1024
+0.810
+
+
+model，wsi + wsi cli ？；， wsi + rad 
+
+579tcga_lihc.csv
+for fold in 0 1 2 3 4
+do
+python train_bycase_balance.py \
+--manifest ./label_csv/679slide_label.csv \
+--data_dir feature_bags_UNI_256um \
+--input_feature_size 1024 \
+--fold ${fold} \
+--result_dir ./result_new/8.21_milan2_462train
+done
+
+tensorboard --logdir '/hpc2hdd/JH_DATA/share/yangwu/yangwu_yangwu_ALL_projects/im4MEC/result_new/8.21_milan2_462train'
+tensorboard --logdir './result/8.5_462_wsi+cli512dim_UNI256'
+
+## 8.25 cli
+for fold in 0 1 2 3 4
+do
+python train_wsi+cli.py \
+--manifest ./label_csv/679slide_label.csv \
+--cli ./label_csv/tcga_lihc_clinical_579.csv \
+--data_dir feature_bags_UNI_256um \
+--input_feature_size 1024 \
+--fold ${fold} \
+--result_dir ./result_new/8.25_462train_wsi+cli
+done
+
+tensorboard --logdir './result_new/8.25_462train_wsi+cli'
+
+python test_all_cp_wsi_cli.py \
+--manifest ./label_csv/117case.csv \
+--cli ./label_csv/tcga_lihc_clinical_579.csv \
+--data_dir feature_bags_UNI_256um \
+--input_feature_size 1024
