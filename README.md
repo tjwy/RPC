@@ -1,2 +1,2 @@
-# PRC
-Source code for Recurrence Pattern Classification (RPC) model.
+# RPC
+Source code for Recurrence Pattern Classification (RPC) models.
