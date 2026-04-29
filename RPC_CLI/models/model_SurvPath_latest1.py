@@ -28,16 +28,20 @@ def exists(val):
 
 # def SeqVIT:
 class SeqVIT(nn.Module):
-    def __init__(self,sequence_length=3, image_size=224, pretrained=False):
+    def __init__(self,sequence_length=3, image_size=224,drop_rate=0.1, pretrained=False):
         super(SeqVIT, self).__init__()
         self.image_size = image_size
         self.sequence_length = sequence_length
+        self.drop_rate = drop_rate
         self.vit_base_model = timm.create_model(
             # 'vit_base_patch16_224',
             'resnet50',
             pretrained=pretrained,
             num_classes=0,  # Removing the classification head
+            # img_size= image_size,
+            # drop_rate= 0.1,   # dropout  0.1
         )
+        # self.dropout = nn.Dropout(0.2)
         self.flatten = nn.Flatten()
 
     def forward(self, inputs):
@@ -55,12 +59,14 @@ class SeqVIT(nn.Module):
             )
 
         inputs = inputs.permute(0, 3, 1, 2).contiguous()
+        # print("Inputs shape:", inputs.shape)
         for t in range(self.sequence_length):
             c_start = t * 3
             c_end = (t + 1) * 3
             output_t = self.vit_base_model(inputs[:, c_start:c_end, :, :])
             outputs.append(output_t)
         stacked_outputs = torch.stack(outputs, dim=1)  # Use torch.stack instead of torch.cat
+        # dropout_output = self.dropout(stacked_outputs)
         return stacked_outputs
 
 class SurvPath(nn.Module):
@@ -72,10 +78,7 @@ class SurvPath(nn.Module):
         num_classes=2,# ##4
         wsi_projection_dim=256,
         image_size=224,
-        sequence_length=3,
-        mri_encoder_weights=None,
-        mri_encoder_pretrained=False,
-        freeze_mri_encoder=False,
+        sequence_length=3
     ):
         super(SurvPath, self).__init__()
 
@@ -91,21 +94,9 @@ class SurvPath(nn.Module):
         self.wsi_projection_net = nn.Sequential(
             nn.Linear(self.wsi_embedding_dim, self.wsi_projection_dim),
         )
-        self.seq_vit_model = SeqVIT(
-            sequence_length=sequence_length,
-            image_size=image_size,
-            pretrained=mri_encoder_pretrained,
-        )
-
-        if mri_encoder_weights:
-            seqvit_weights = torch.load(mri_encoder_weights, map_location="cpu")
-            self.seq_vit_model.load_state_dict(seqvit_weights, strict=False)
-
-        if freeze_mri_encoder:
-            for param in self.seq_vit_model.parameters():
-                param.requires_grad = False
-
-
+        # SeqVIT  SurvPath 
+        # self.seq_vit_model = SeqVIT(sequence_length=sequence_length, image_size=image_size, drop_rate=dropout)
+        self.seq_vit_model = SeqVIT(sequence_length=sequence_length, image_size=image_size, drop_rate=0.1)        
         # SeqVIT  GPU 
         if torch.cuda.is_available():
             self.seq_vit_model = self.seq_vit_model.to("cuda")
@@ -138,11 +129,11 @@ class SurvPath(nn.Module):
         )
         self.alpha = nn.Parameter(torch.tensor(1.0))
         self.clinical_fc = nn.Sequential(
-            nn.Linear(19, 32), 
-            # nn.ELU(),  ### ELU
-            nn.ReLU(),
+            nn.Linear(19, 32),  # Match checkpoint: 19->32
+            nn.ELU(),  ### ELU
+            # nn.ReLU(),
             nn.Dropout(dropout),
-            nn.Linear(32, 64)
+            nn.Linear(32, 64)  # Match checkpoint: 32->64
         )
     def forward(self, **kwargs):
         wsi_features = kwargs['x_wsi'] 
@@ -154,9 +145,8 @@ class SurvPath(nn.Module):
         clinical_features = kwargs['clinical_data'] # ##   #### here   
         
         mask = None
-        # return_attn = kwargs["return_attn"]
-        # return_attn = True
-        return_attn = False
+        return_attn = bool(kwargs.get('return_attn', False))
+
         # WSI
         wsi_proj = self.wsi_projection_net(wsi_features)
 
@@ -183,14 +173,14 @@ class SurvPath(nn.Module):
         wsi_postSA_embed = mm_embed[:, self.num_slices:, :]
         wsi_postSA_embed = torch.mean(wsi_postSA_embed, dim=1)
 
-        # print("WSI Features shape after passing to model:", wsi_postSA_embed.shape)
-                # WSI             
+        # WSI             
         if clinical_features is not None:
             assert isinstance(clinical_features, torch.Tensor), "Clinical features should be a torch.Tensor."
 
-            clinical_proj = clinical_features.to(torch.float).unsqueeze(0)
-            # print("Clinical Features shape before passing to model:", clinical_proj.shape)
-            # print("Clinical Features shape before passing to model:", clinical_proj)
+            # Clinical features already have batch dim (1, 19), no need to unsqueeze
+            clinical_proj = clinical_features.to(torch.float)
+            if len(clinical_proj.shape) == 1:
+                clinical_proj = clinical_proj.unsqueeze(0)
             clinical_proj = self.clinical_fc(clinical_proj)
             clinical_embedding = self.alpha * clinical_proj
             embedding = torch.cat([wsi_postSA_embed, paths_postSA_embed,clinical_embedding], dim=1)
