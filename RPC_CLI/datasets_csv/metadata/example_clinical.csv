@@ -1,0 +1,6 @@
+case_id,group,age,NLR,PLT,tumor_dm,Gamma-Glutamyltransferase,Alkaline_Phosphatase,Cirrhosis,major_resection,Poor_differentiation,MVI,Satellite_nodules,BCLC,AFP400
+CASE_EXAMPLE_001,train,58,2.1,180,3.2,45,90,0,0,0,0,0,A,0
+CASE_EXAMPLE_002,train,62,3.4,150,4.1,60,110,1,1,1,0,1,B,1
+CASE_EXAMPLE_003,train,55,1.8,210,2.7,35,85,0,0,0,0,0,A,0
+CASE_EXAMPLE_004,train,67,4.0,130,5.6,80,140,1,1,1,1,1,B,1
+CASE_EXAMPLE_005,train,49,2.6,190,3.8,50,100,0,0,0,0,0,B,0

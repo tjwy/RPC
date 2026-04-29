@@ -1,20 +1,17 @@
-# Adapted from https://github.com/mahmoodlab/SurvPath/blob/main/utils/core_utils.py
-# @article{jaume2023modeling,
-#   title={Modeling Dense Multimodal Interactions Between Biological Pathways and Histology for Survival Prediction},
-#   author={Jaume, Guillaume and Vaidya, Anurag and Chen, Richard and Williamson, Drew and Liang, Paul and Mahmood, Faisal},
-#   journal={Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition (CVPR)},
-#   year={2024}
-# }
-
-from ast import Lambda
 import numpy as np
 import pdb
 import os
 from custom_optims.radam import RAdam
+from custom_optims.lamb import Lamb
+# from models.model_SurvPath_latest11_cli import SurvPath
+from models.model_SurvPath_freeze_RPC import SurvPath
+from models.model_DLRP import SurvPathDLRP
+from models.model_pre_dlr_adapter import SurvPathPREAdapter, SurvPathDLRAdapter, SurvPathDLPAdapter
+from models.model_19CLI import ClinicalOnlyModel
 
-from models.model_MCATPathways_latest import MCATPathways
-from models.model_SurvPath_latest11_cli import SurvPath
-
+# from models.model_TMIL import TMIL
+# from sksurv.metrics import concordance_index_censored, concordance_index_ipcw, brier_score, integrated_brier_score, cumulative_dynamic_auc
+# from sksurv.util import Surv
 import torch.nn as nn
 from transformers import (
     get_constant_schedule_with_warmup, 
@@ -32,6 +29,15 @@ from utils.loss_func import NLLSurvLoss
 import torch.optim as optim
 from sklearn.metrics import roc_auc_score, accuracy_score
 from sklearn.metrics import confusion_matrix, accuracy_score, precision_score, recall_score, roc_auc_score
+
+
+def _resolve_cls_threshold(args_or_threshold):
+    """Resolve and clamp the classification threshold to [0, 1]."""
+    if isinstance(args_or_threshold, (int, float)):
+        threshold = float(args_or_threshold)
+    else:
+        threshold = float(getattr(args_or_threshold, "cls_threshold", 0.5))
+    return min(1.0, max(0.0, threshold))
 
 def _get_splits(datasets, cur, args):
     r"""
@@ -51,8 +57,8 @@ def _get_splits(datasets, cur, args):
     print('\nTraining Fold {}!'.format(cur))
     print('\nInit train/val splits...', end=' ')
     train_split, val_split = datasets
-
-    train_dataset, val_dataset = datasets  
+    # _save_splits(datasets, ['train', 'val'], os.path.join(args.results_dir, 'splits_{}.csv'.format(cur)))
+    train_dataset, val_dataset = datasets  # train_dataset  val_dataset train_split  val_split
     _save_splits([train_dataset, val_dataset], ['train', 'val'], os.path.join(args.results_dir, 'splits_{}.csv'.format(cur)))
     print('Done!')
     print("Training on {} samples".format(len(train_split)))
@@ -74,9 +80,9 @@ def _init_loss_function(args):
     """
     print('\nInit loss function...', end=' ')
 
-    if args.bag_loss == 'bce_logits':  
+    if args.bag_loss == 'bce_logits':  # Sigmoid logits 
         loss_fn = nn.BCEWithLogitsLoss( reduction='mean')
-    elif args.bag_loss == 'cross_entropy':  
+    elif args.bag_loss == 'cross_entropy':  # one-hot 
         loss_fn = nn.CrossEntropyLoss( reduction='mean')
     elif args.bag_loss == 'BCEloss':
         loss_fn = nn.BCELoss()
@@ -107,7 +113,7 @@ def _init_optim(args, model):
     elif args.opt == "radam":
         optimizer = RAdam(model.parameters(), lr=args.lr, weight_decay=args.reg)
     elif args.opt == "lamb":
-        optimizer = Lambda(model.parameters(), lr=args.lr, weight_decay=args.reg)
+        optimizer = Lamb(model.parameters(), lr=args.lr, weight_decay=args.reg)
     else:
         raise NotImplementedError
 
@@ -120,18 +126,55 @@ def _init_model(args):
     if args.modality == "survpath":
 
         model_dict = {'num_classes': args.n_classes}
+        model_dict['mri_encoder_weights'] = getattr(args, 'mri_encoder_weights', None)
+        model_dict['mri_encoder_pretrained'] = bool(getattr(args, 'mri_encoder_pretrained', False))
+        model_dict['freeze_mri_encoder'] = bool(getattr(args, 'freeze_mri_encoder', False))
         model = SurvPath(**model_dict)
+
+    elif args.modality == "dlrp":
+
+        model_dict = {'num_classes': args.n_classes}
+        model = SurvPathDLRP(**model_dict)
+
+    elif args.modality in ["pre_cli", "post_cli", "cli"]:
+
+        clinical_dim = int(getattr(args, "pre_adapter_clinical_dim", 19))
+        model_dropout = float(getattr(args, "encoder_dropout", 0.1))
+        model = ClinicalOnlyModel(clinical_dim=clinical_dim, dropout=model_dropout)
+
+    elif args.modality in ["pre_adapter", "pre"]:
+
+        clinical_dim = int(getattr(args, "pre_adapter_clinical_dim", 19))
+        model = SurvPathPREAdapter(
+            clinical_dim=clinical_dim,
+            pretrained_backbone=bool(getattr(args, 'mri_encoder_pretrained', False)),
+            mri_encoder_weights=getattr(args, 'mri_encoder_weights', None),
+            freeze_mri_encoder=bool(getattr(args, 'freeze_mri_encoder', False)),
+        )
+
+    elif args.modality in ["dlr_adapter", "dlr"]:
+
+        model = SurvPathDLRAdapter(
+            pretrained_backbone=bool(getattr(args, 'mri_encoder_pretrained', False)),
+            mri_encoder_weights=getattr(args, 'mri_encoder_weights', None),
+            freeze_mri_encoder=bool(getattr(args, 'freeze_mri_encoder', False)),
+        )
+
+    elif args.modality in ["dlp_adapter", "dlp", "abmil_wsi"]:
+
+        wsi_input_dim = int(getattr(args, "encoding_dim", 1024))
+        model_dropout = float(getattr(args, "encoder_dropout", 0.1))
+        model = SurvPathDLPAdapter(wsi_input_dim=wsi_input_dim, dropout=model_dropout)
 
 
     else:
         raise NotImplementedError
-       
     print(f"Initialized model: {model.__class__.__name__}")
     if torch.cuda.is_available():
         model = model.to(torch.device('cuda'))
 
     print('Done!')
-    _print_network(args.results_dir, model)  
+    _print_network(args.results_dir, model)  # ## block grad-cam-fixed
     return model
 
 def _init_loaders(args, train_split, val_split):
@@ -205,28 +248,53 @@ def _unpack_data(modality, device, data):
     
     """
     
-    if modality in ["survpath"]:
+    if modality in ["pre_cli", "post_cli", "cli"]:
 
-       
         data_WSI = data[0].to(device)
-                # data_rad，，
-        if isinstance(data[1][0], list):  # data[1][0]
-            data_rad = torch.stack([item.to(device) for item in data[1][0]])
-        else:
-            data_rad = data[1][0].to(device)
+        data_rad = None
+        y_disc = data[2]
+        clinical_data_list = data[3]
+        mask = None
 
-        if data[4][0,0] == 1:
+    elif modality in ["dlp_adapter", "dlp", "abmil_wsi"]:
+
+        data_WSI = data[0].to(device)
+        y_disc = data[2]
+        clinical_data_list = data[3]
+
+        if data[4].dim() >= 2 and data[4][0, 0] == 1:
             mask = None
         else:
             mask = data[4].to(device)
-            #  y_disc  (batch_size,) 
 
-        y_disc = data[2]  #  data[2]  Tensor
+        data_rad = None
 
-        # print('y_disc',y_disc)
-        # 
-        # print(f"Original y_disc type: {type(y_disc)}, shape: {y_disc.shape}")
+    elif modality in ["survpath", "dlrp", "pre_adapter", "pre", "dlr_adapter", "dlr"]:
 
+        data_WSI = data[0].to(device)
+
+        rad_items = data[1]
+        if isinstance(rad_items, list):
+            if len(rad_items) == 0:
+                raise ValueError("Empty MRI batch in collate output")
+            if isinstance(rad_items[0], torch.Tensor):
+                data_rad = torch.stack([item.float() for item in rad_items], dim=0).to(device)
+            else:
+                data_rad = torch.tensor(rad_items, dtype=torch.float32, device=device)
+        elif isinstance(rad_items, torch.Tensor):
+            data_rad = rad_items.to(device)
+        else:
+            data_rad = torch.tensor(rad_items, dtype=torch.float32, device=device)
+
+        if data_rad.dim() == 3:
+            data_rad = data_rad.unsqueeze(0)
+
+        if data[4].dim() >= 2 and data[4][0, 0] == 1:
+            mask = None
+        else:
+            mask = data[4].to(device)
+
+        y_disc = data[2]
         clinical_data_list = data[3]
     else:
         raise ValueError('Unsupported modality:', modality)
@@ -262,12 +330,20 @@ def _process_data_and_forward(model, modality, device, data):
     # print(f"WSI Features shape before passing to model: {data_WSI.shape}")
     # print(f"WSI Features shape before passing to model: {type(data_rad)}")
  
-    if modality == "survpath":   
+    if modality in ["pre_cli", "post_cli", "cli"]:
+        clinical_data_tensor = torch.tensor(clinical_data_list, dtype=torch.float32, device=device)
+        if clinical_data_tensor.dim() == 1:
+            clinical_data_tensor = clinical_data_tensor.unsqueeze(0)
+        out = model(clinical_data=clinical_data_tensor)
+
+    elif modality in ["dlp_adapter", "dlp", "abmil_wsi"]:
+        out = model(x_wsi=data_WSI.to(device), mask=mask)
+
+    elif modality in ["survpath", "dlrp"]:
         input_args = {
             "x_wsi": data_WSI.to(device)
         }
 
-        # 
         # assert isinstance(img_features, torch.Tensor), f"img_features should be a torch.Tensor but got {type(img_features)}"
         # print(f"img_features type after unpacking: {type(img_features)}")
         # input_args
@@ -276,27 +352,33 @@ def _process_data_and_forward(model, modality, device, data):
 
         input_args["return_attn"] = False
         
-        assert isinstance(clinical_data_list, list) and all(isinstance(x, list) for x in clinical_data_list), ""
-        # 
-        flattened_clinical_data_list = [float(item) for sublist in clinical_data_list for item in sublist]
-        
-        # 
-        clinical_data_tensors = [torch.tensor(item).to(device) for item in flattened_clinical_data_list]
-
-        # 
-        clinical_data_tensor = torch.stack(clinical_data_tensors)
-        # print(clinical_data_tensor.shape)
-        # input_argsclinical_data
-        input_args["clinical_data"] = clinical_data_tensor
+        if modality == "dlrp":
+            # DLRP explicitly removes the clinical branch.
+            input_args["clinical_data"] = None
+        else:
+            assert isinstance(clinical_data_list, list) and all(isinstance(x, list) for x in clinical_data_list), ""
+            flattened_clinical_data_list = [float(item) for sublist in clinical_data_list for item in sublist]
+            clinical_data_tensors = [torch.tensor(item).to(device) for item in flattened_clinical_data_list]
+            clinical_data_tensor = torch.stack(clinical_data_tensors)
+            input_args["clinical_data"] = clinical_data_tensor
         out = model(**input_args)
 
+    elif modality in ["pre_adapter", "pre", "dlr_adapter", "dlr"]:
+        input_args = {
+            "x_img": data_rad.to(device),
+            "return_attn": False,
+        }
+        if modality in ["pre_adapter", "pre"]:
+            clinical_data_tensor = torch.tensor(clinical_data_list, dtype=torch.float32, device=device)
+            if clinical_data_tensor.dim() == 1:
+                clinical_data_tensor = clinical_data_tensor.unsqueeze(0)
+            input_args["clinical_data"] = clinical_data_tensor
+        else:
+            input_args["clinical_data"] = None
+        out = model(**input_args)
 
     else:
-        out = model(
-            data_omics = data_omics, 
-            data_WSI = data_WSI, 
-            mask = mask
-            )
+        raise ValueError(f"Unsupported modality for forward: {modality}")
 
     if len(out.shape) == 1:
         out = out.unsqueeze(0)
@@ -346,36 +428,53 @@ def _update_arrays(all_risk_scores,  all_clinical_data,  risk, clinical_data_lis
     return all_risk_scores, all_clinical_data
     
 def bootstrap_metric(y_true, y_pred_or_scores, metric_func, n_bootstraps=1000):
+    n_bootstraps = int(n_bootstraps)
+
+    # Fast path: point estimate only (used for intermediate epochs).
+    if n_bootstraps <= 0:
+        try:
+            value = metric_func(y_true, y_pred_or_scores)
+        except Exception:
+            value = np.nan
+        return float(value), float(value), float(value)
+
     metrics = []
     for _ in range(n_bootstraps):
         resampled_indices = np.random.choice(len(y_true), len(y_true), replace=True)
         resampled_y_true = y_true[resampled_indices]
-        #  AUC，；，
+        # AUC
         # if metric_func == roc_auc_score:
         resampled_y_pred_or_scores = y_pred_or_scores[resampled_indices]  
         # else: 
         #     resampled_y_pred_or_scores = (y_pred_or_scores[resampled_indices] > 0.5).astype(int)
-        metrics.append(metric_func(resampled_y_true, resampled_y_pred_or_scores))
+        try:
+            metrics.append(metric_func(resampled_y_true, resampled_y_pred_or_scores))
+        except Exception:
+            # Skip invalid bootstrap samples (e.g., one-class AUC resamples).
+            continue
+    if len(metrics) == 0:
+        return np.nan, np.nan, np.nan
     metrics = np.array(metrics)
     lower_bound, upper_bound = np.percentile(metrics, [2.5, 97.5])
     mean = np.mean(metrics)
     return mean, lower_bound, upper_bound
 
 def ppv(y_true, y_pred):
-    train_conf_matrix = confusion_matrix(y_true, y_pred)
-    ppv = train_conf_matrix[1, 1] / (train_conf_matrix[1, 1]+train_conf_matrix[0, 1])
-    return ppv
+    train_conf_matrix = confusion_matrix(y_true, y_pred, labels=[0, 1])
+    den = train_conf_matrix[1, 1] + train_conf_matrix[0, 1]
+    return train_conf_matrix[1, 1] / den if den > 0 else 0.0
 
 def npv(y_true, y_pred):
-    train_conf_matrix = confusion_matrix(y_true, y_pred)
-    npv = train_conf_matrix[0, 0] / (train_conf_matrix[0, 0] + train_conf_matrix[1, 0])
-    return npv
+    train_conf_matrix = confusion_matrix(y_true, y_pred, labels=[0, 1])
+    den = train_conf_matrix[0, 0] + train_conf_matrix[1, 0]
+    return train_conf_matrix[0, 0] / den if den > 0 else 0.0
 
 def specificity(y_true, y_pred):
-    train_conf_matrix = confusion_matrix(y_true, y_pred)
-    specificity = train_conf_matrix[0, 0] / sum(train_conf_matrix[0, :])
-    return specificity
-def calculate_metrics_all(all_labels, all_probs):
+    train_conf_matrix = confusion_matrix(y_true, y_pred, labels=[0, 1])
+    den = sum(train_conf_matrix[0, :])
+    return train_conf_matrix[0, 0] / den if den > 0 else 0.0
+
+def calculate_metrics_all(all_labels, all_probs, threshold=0.5, n_bootstraps=1000):
     """
     Calculate various metrics including AUC, Accuracy, Sensitivity, Specificity, PPV, NPV.
     
@@ -390,53 +489,26 @@ def calculate_metrics_all(all_labels, all_probs):
             A dictionary containing calculated metrics.
     """
     metrics_dict = {}
-    all_preds = (all_probs > 0.5).astype(int)
+    all_labels = np.asarray(all_labels).reshape(-1)
+    all_probs = np.asarray(all_probs).reshape(-1)
+    threshold = _resolve_cls_threshold(threshold)
+    all_preds = (all_probs > threshold).astype(int)
 
     # Calculate AUC
-    metrics_dict['AUC'] = bootstrap_metric(all_labels, all_probs, roc_auc_score)
+    metrics_dict['AUC'] = bootstrap_metric(all_labels, all_probs, roc_auc_score, n_bootstraps=n_bootstraps)
 
     # Calculate Accuracy
-    metrics_dict['ACC'] = bootstrap_metric(all_labels, all_preds, accuracy_score)
+    metrics_dict['ACC'] = bootstrap_metric(all_labels, all_preds, accuracy_score, n_bootstraps=n_bootstraps)
 
     # Calculate Sensitivity, Specificity, PPV, NPV using a custom bootstrap function
-    metrics_dict['recall'] = bootstrap_metric(all_labels, all_preds, recall_score)
-    metrics_dict['SPECIFICITY'] = bootstrap_metric(all_labels, all_preds, specificity)
-    metrics_dict['PPV'] = bootstrap_metric(all_labels, all_preds, ppv)
-    metrics_dict['NPV'] = bootstrap_metric(all_labels, all_preds, npv)
+    metrics_dict['recall'] = bootstrap_metric(all_labels, all_preds, recall_score, n_bootstraps=n_bootstraps)
+    metrics_dict['SPECIFICITY'] = bootstrap_metric(all_labels, all_preds, specificity, n_bootstraps=n_bootstraps)
+    metrics_dict['PPV'] = bootstrap_metric(all_labels, all_preds, ppv, n_bootstraps=n_bootstraps)
+    metrics_dict['NPV'] = bootstrap_metric(all_labels, all_preds, npv, n_bootstraps=n_bootstraps)
     return metrics_dict
 
-# def calculate_metrics_all(all_labels, all_probs):
-#     """
-#     Calculate various metrics including AUC, Accuracy, Sensitivity, Specificity, PPV, NPV.
-    
-#     Args:
-#         - all_labels : np.array
-#             True binary labels.
-#         - all_probs : np.array
-#             Predicted probabilities for the positive class.
-    
-#     Returns:
-#         - metrics_dict : dict
-#             A dictionary containing calculated metrics.
-#     """
-#     metrics_dict = {}
-    
-#     # Calculate AUC and accuracy
-#     metrics_dict['AUC'] = roc_auc_score(all_labels, all_probs)
-#     metrics_dict['ACC'] = accuracy_score(all_labels, (all_probs > 0.5).astype(int))
-    
-#     # Calculate confusion matrix
-#     cm = confusion_matrix(all_labels, (all_probs > 0.5).astype(int))
-    
-#     # Calculate sensitivity, specificity, PPV, NPV
-#     TP, FP, FN, TN = cm[1, 1], cm[0, 1], cm[1, 0], cm[0, 0]
-#     metrics_dict['SENSITIVITY'] = TP / (TP + FN) if (TP + FN) > 0 else 0
-#     metrics_dict['SPECIFICITY'] = TN / (TN + FP) if (TN + FP) > 0 else 0
-#     metrics_dict['PPV'] = TP / (TP + FP) if (TP + FP) > 0 else 0
-#     metrics_dict['NPV'] = TN / (TN + FN) if (TN + FN) > 0 else 0
-    
-#     return metrics_dict
-def _train_loop_survival(epoch, model, modality, loader, optimizer, scheduler, loss_fn):
+
+def _train_loop_survival(epoch, model, modality, loader, optimizer, scheduler, loss_fn, cls_threshold=0.5, n_bootstraps=0):
     r"""
     Perform one epoch of training 
 
@@ -457,6 +529,7 @@ def _train_loop_survival(epoch, model, modality, loader, optimizer, scheduler, l
     model.train()
 
     total_loss = 0.
+    cls_threshold = _resolve_cls_threshold(cls_threshold)
 
     running_corrects = 0
     all_probs = []
@@ -464,7 +537,7 @@ def _train_loop_survival(epoch, model, modality, loader, optimizer, scheduler, l
     all_risk_scores = []
 
     all_clinical_data = []
-
+    all_case_ids = []  # <- case_id
     # one epoch
     for batch_idx, data in enumerate(loader):
         
@@ -480,61 +553,84 @@ def _train_loop_survival(epoch, model, modality, loader, optimizer, scheduler, l
 
         loss = loss_fn(input=h, target=y_disc)
         loss_value = loss.item()
-        loss = loss / y_disc.shape[0]
+        batch_size = y_disc.shape[0]
         
         risk, _ = _calculate_risk(h)
 
         all_risk_scores, all_clinical_data = _update_arrays(all_risk_scores, all_clinical_data, risk, clinical_data_list)
 
-        total_loss += loss_value 
+        total_loss += loss_value * batch_size
 
         probs = torch.sigmoid(h)  # Convert logits to probabilities
         # all_probs.append(probs[:, 1].detach().cpu().numpy())
         ###
-        all_probs.append(probs.detach().cpu().numpy()) ## 
+        all_probs.append(probs.detach().cpu().numpy())
         all_labels.append(y_disc.detach().cpu().numpy())
         loss.backward()
 
         optimizer.step()
         scheduler.step()
-        ### ###
+                # === case_idslide_id ===
+        case_ids = loader.dataset.metadata.iloc[batch_idx : (batch_idx+1)]['case_id']
+        all_case_ids.extend(case_ids)
         # if (batch_idx % 20) == 0:
         #     print("batch: {}, loss: {:.3f}".format(batch_idx, loss.item()))
     
     total_loss /= len(loader.dataset)
     all_risk_scores = np.concatenate(all_risk_scores, axis=0)
 
-    all_probs = np.concatenate(all_probs)
-    all_labels = np.concatenate(all_labels)
+    all_probs = np.concatenate(all_probs).reshape(-1)
+    all_labels = np.concatenate(all_labels).reshape(-1)
 
 
     # Calculate AUC and accuracy
     train_auc = roc_auc_score(all_labels, all_probs)
 
-    train_acc = accuracy_score(all_labels, (all_probs > 0.5).astype(int))
+    train_acc = accuracy_score(all_labels, (all_probs > cls_threshold).astype(int))
 
-    # ，
-    all_predictions = (all_probs > 0.5).astype(np.int32)
+    all_predictions = (all_probs > cls_threshold).astype(np.int32)
+    
     cm = confusion_matrix(all_labels, all_predictions)
 
-    #  TP, FP, FN, TN
+    # TP, FP, FN, TN
     TP = cm[1, 1]
     FP = cm[0, 1]
     FN = cm[1, 0]
     TN = cm[0, 0]
 
-    # 
-    sensitivity = TP / (TP + FN) if (TP + FN) > 0 else 0  # 
-    specificity = TN / (TN + FP) if (TN + FP) > 0 else 0  # 
-    PPV = TP / (TP + FP) if (TP + FP) > 0 else 0  # 
-    NPV = TN / (TN + FN) if (TN + FN) > 0 else 0  # 
-    print('Epoch: {}, train_loss: {:.4f}, train_auc: {:.4f}, train_acc: {:.4f}, Sensitivity: {:.3f}, Specificity: {:.3f}, PPV: {:.3f}, NPV: {:.3f}'.format(epoch, total_loss, train_auc, train_acc,sensitivity, specificity, PPV, NPV))
+    sensitivity = TP / (TP + FN) if (TP + FN) > 0 else 0
+    specificity = TN / (TN + FP) if (TN + FP) > 0 else 0
+    PPV = TP / (TP + FP) if (TP + FP) > 0 else 0
+    NPV = TN / (TN + FN) if (TN + FN) > 0 else 0
+    print('Epoch: {}, train_loss: {:.4f}, train_auc: {:.4f}, train_acc: {:.4f}, Sensitivity: {:.3f}, Specificity: {:.3f}, PPV: {:.3f}, NPV: {:.3f}, Thresh: {:.2f}'.format(epoch, total_loss, train_auc, train_acc, sensitivity, specificity, PPV, NPV, cls_threshold))
     # print('Epoch: {}, train_loss: {:.4f}, train_auc: {:.4f}, train_acc: {:.4f}'.format(epoch, total_loss, train_auc, train_acc))
-    train_metrics_dict =  calculate_metrics_all(all_labels, all_probs)
+    train_metrics_dict = calculate_metrics_all(
+        all_labels,
+        all_probs,
+        threshold=cls_threshold,
+        n_bootstraps=n_bootstraps,
+    )
+            # ===  ===
+        # all_probs  all_labels
+    # all_probsall_labels
+    all_probs = all_probs.reshape(-1)
+    all_labels = all_labels.reshape(-1)
+    
+    if len(all_case_ids) != len(all_probs):
+        # Random/weighted samplers break simple index slicing; keep output lengths aligned.
+        all_case_ids = [f"train_case_{i}" for i in range(len(all_probs))]
 
-    return train_auc, train_acc, total_loss ,train_metrics_dict
+    train_results = {
+        'case_id': all_case_ids,
+        'probs': all_probs,
+        'labels': all_labels,
+        'predictions': (all_probs > cls_threshold).astype(int)
+    }
 
-def _calculate_metrics(loader, dataset_factory, all_labels, all_probs):
+    return train_auc, train_acc, total_loss ,train_metrics_dict,train_results
+    # return train_auc, train_acc, total_loss ,train_metrics_dict,cm
+
+def _calculate_metrics(loader, dataset_factory, all_labels, all_probs, cls_threshold=0.5):
     r"""
     Calculate various survival metrics 
     
@@ -553,16 +649,20 @@ def _calculate_metrics(loader, dataset_factory, all_labels, all_probs):
 
     iauc, acc = 0., 0.
 
+    all_labels = np.asarray(all_labels).reshape(-1)
+    all_probs = np.asarray(all_probs).reshape(-1)
+    cls_threshold = _resolve_cls_threshold(cls_threshold)
+
     # Calculate AUC and accuracy for validation set
     val_auc = roc_auc_score(all_labels, all_probs)
-    val_acc = accuracy_score(all_labels, (all_probs > 0.5).astype(int))
+    val_acc = accuracy_score(all_labels, (all_probs > cls_threshold).astype(int))
 
     # print('val_auc: {:.4f}, val_acc: {:.4f}'.format(val_auc, val_acc))
 
     return val_auc, val_acc
 
 
-def _summary(dataset_factory, model, modality, loader, loss_fn, survival_train=None):
+def _summary(dataset_factory, model, modality, loader, loss_fn, survival_train=None, cls_threshold=0.5, n_bootstraps=0):
     r"""
     Run a validation loop on the trained model 
     
@@ -588,6 +688,7 @@ def _summary(dataset_factory, model, modality, loader, loss_fn, survival_train=N
     model.eval()
 
     total_loss = 0.
+    cls_threshold = _resolve_cls_threshold(cls_threshold)
     incorrect_cases = [] ## add
     all_case_ids = [] ###add
 
@@ -609,50 +710,68 @@ def _summary(dataset_factory, model, modality, loader, loss_fn, survival_train=N
 
             data_WSI, mask, y_disc, data_rad, clinical_data_list, mask = _unpack_data(modality, device, data)
 
-            if modality == "survpath":
+            if modality in ["pre_cli", "post_cli", "cli"]:
+                clinical_data_tensor = torch.tensor(clinical_data_list, dtype=torch.float32, device=device)
+                if clinical_data_tensor.dim() == 1:
+                    clinical_data_tensor = clinical_data_tensor.unsqueeze(0)
+                h = model(clinical_data=clinical_data_tensor)
+
+            elif modality in ["dlp_adapter", "dlp", "abmil_wsi"]:
+                h = model(x_wsi=data_WSI.to(device), mask=mask)
+
+            elif modality in ["survpath", "dlrp"]:
 
                 input_args = {"x_wsi": data_WSI.to(device)}
                 # for i in range(len(data_omics)):
                 #     input_args['x_omic%s' % str(i+1)] = data_omics[i].type(torch.FloatTensor).to(device)
-                ## 
 
                 # input_args
                 input_args["x_img"] = data_rad.to(device)
-                        # 
                 flattened_clinical_data_list = [float(item) for sublist in clinical_data_list for item in sublist]
                 
-                # 
                 clinical_data_tensors = [torch.tensor(item).to(device) for item in flattened_clinical_data_list]
 
-                # 
                 clinical_data_tensor = torch.stack(clinical_data_tensors)
                 # print(clinical_data_tensor.shape)
                 # input_argsclinical_data
-                input_args["clinical_data"] = clinical_data_tensor
+                if modality == "dlrp":
+                    input_args["clinical_data"] = None
+                else:
+                    input_args["clinical_data"] = clinical_data_tensor
 
                 # input_args["return_attn"] = False                
                 h = model(**input_args)
+
+            elif modality in ["pre_adapter", "pre", "dlr_adapter", "dlr"]:
+                input_args = {
+                    "x_img": data_rad.to(device),
+                    "return_attn": False,
+                }
+                if modality in ["pre_adapter", "pre"]:
+                    clinical_data_tensor = torch.tensor(clinical_data_list, dtype=torch.float32, device=device)
+                    if clinical_data_tensor.dim() == 1:
+                        clinical_data_tensor = clinical_data_tensor.unsqueeze(0)
+                    input_args["clinical_data"] = clinical_data_tensor
+                else:
+                    input_args["clinical_data"] = None
+                h = model(**input_args)
                 
             else:
-                h = model(
-                    data_omics = data_omics, 
-                    data_WSI = data_WSI, 
-                    mask = mask
-                    )
+                raise ValueError(f"Unsupported modality in summary: {modality}")
                     
             if len(h.shape) == 1:
                 h = h.unsqueeze(0)
 
 
             
-            #  y_disc 
+            # y_disc 
             # if y_disc.dim() == 2 and y_disc.size(1) == 1:
             #     y_disc = y_disc.squeeze(1)
             # y_disc = y_disc.long()
             y_disc = y_disc.type(torch.float)
             loss = loss_fn(input=h, target=y_disc)
             loss_value = loss.item()
-            loss = loss / y_disc.shape[0]
+            batch_size = y_disc.shape[0]
 
 
             risk, risk_by_bin = _calculate_risk(h)
@@ -662,16 +781,19 @@ def _summary(dataset_factory, model, modality, loader, loss_fn, survival_train=N
             # probs = probs[:, 1]
             all_probs.append(probs.detach().cpu().numpy())
             all_labels.append(y_disc.detach().cpu().numpy())
-            total_loss += loss_value
+            total_loss += loss_value * batch_size
             all_slide_ids.append(slide_ids.values[count])
             count += 1
 
     total_loss /= len(loader.dataset)
     all_risk_scores = np.concatenate(all_risk_scores, axis=0)
 
-    all_probs = np.concatenate(all_probs, axis=0)
-    all_labels = np.concatenate(all_labels, axis=0)
-    all_predictions = (all_probs > 0.5).astype(np.int32)
+    all_probs = np.concatenate(all_probs, axis=0).reshape(-1)
+    all_labels = np.concatenate(all_labels, axis=0).reshape(-1)
+    all_predictions = (all_probs > cls_threshold).astype(np.int32)
+
+    cm = confusion_matrix(all_labels, all_predictions)
+
     patient_results = {}
 
     for i in range(len(all_slide_ids)):
@@ -683,11 +805,16 @@ def _summary(dataset_factory, model, modality, loader, loss_fn, survival_train=N
         patient_results[case_id]["probs"] = all_probs[i]
         patient_results[case_id]['preds'] = all_predictions[i]
         patient_results[case_id]['labels'] = all_labels[i]
-    iauc, acc = _calculate_metrics(loader, dataset_factory,  all_labels,all_probs)
+    iauc, acc = _calculate_metrics(loader, dataset_factory, all_labels, all_probs, cls_threshold=cls_threshold)
 
-    val_metrics_dict =  calculate_metrics_all(all_labels, all_probs)
-    
+    val_metrics_dict = calculate_metrics_all(
+        all_labels,
+        all_probs,
+        threshold=cls_threshold,
+        n_bootstraps=n_bootstraps,
+    )
     return patient_results,iauc, acc,total_loss, val_metrics_dict
+    # return patient_results,iauc, acc,total_loss, val_metrics_dict,cm
 
 def _get_lr_scheduler(args, optimizer, dataloader):
     scheduler_name = args.lr_scheduler
@@ -718,7 +845,6 @@ def _get_lr_scheduler(args, optimizer, dataloader):
     return lr_scheduler
 
 
-
 def _step(cur, args, loss_fn, model, optimizer, scheduler,train_loader, val_loader):
     r"""
     Trains the model for the set number of epochs and validates it.
@@ -744,13 +870,49 @@ def _step(cur, args, loss_fn, model, optimizer, scheduler,train_loader, val_load
     """
 
     all_survival = _extract_survival_metadata(train_loader, val_loader,args)
+    cls_threshold = _resolve_cls_threshold(args)
+    bootstrap_n = int(os.environ.get("SURVPATH_BOOTSTRAP_N", "1000"))
+    bootstrap_final_only = str(os.environ.get("SURVPATH_BOOTSTRAP_FINAL_ONLY", "1")).strip().lower() in {
+        "1",
+        "true",
+        "yes",
+        "y",
+    }
+    epoch_bootstrap_n = 0 if bootstrap_final_only else bootstrap_n
+
+    print('Using classification threshold for metrics: {:.2f}'.format(cls_threshold))
+    if bootstrap_final_only:
+        print('Bootstrap CI policy: final validation only (n_bootstraps={})'.format(bootstrap_n))
+    else:
+        print('Bootstrap CI policy: every epoch (n_bootstraps={})'.format(bootstrap_n))
     
     for epoch in range(args.max_epochs):
-        _,_,_,train_metrics_dict = _train_loop_survival(epoch, model, args.modality, train_loader, optimizer,scheduler, loss_fn)
+        # _,_,_,train_metrics_dict,train_cm = _train_loop_survival(epoch, model, args.modality, train_loader, optimizer,scheduler, loss_fn)
+        _,_,_,train_metrics_dict,train_results = _train_loop_survival(
+            epoch,
+            model,
+            args.modality,
+            train_loader,
+            optimizer,
+            scheduler,
+            loss_fn,
+            cls_threshold=cls_threshold,
+            n_bootstraps=epoch_bootstrap_n,
+        )
         
         # evaluate the model
         # val_patient_results, val_iauc, val_acc, val_loss = _summary(val_loader, loss_fn, model, args.modality)
-        results_dict, val_iauc,acc, total_loss,val_metrics_dict = _summary(args.dataset_factory, model, args.modality, val_loader, loss_fn, all_survival)
+        # results_dict, val_iauc,acc, total_loss,val_metrics_dict,val_cm = _summary(args.dataset_factory, model, args.modality, val_loader, loss_fn, all_survival)
+        results_dict, val_iauc,acc, total_loss,val_metrics_dict = _summary(
+            args.dataset_factory,
+            model,
+            args.modality,
+            val_loader,
+            loss_fn,
+            all_survival,
+            cls_threshold=cls_threshold,
+            n_bootstraps=epoch_bootstrap_n,
+        )
         # print('epoch val_iauc: {:.4f} | epoch Val acc: {:.4f} '.format(
         # val_iauc, 
         # acc
@@ -759,13 +921,24 @@ def _step(cur, args, loss_fn, model, optimizer, scheduler,train_loader, val_load
     # save the trained model
     torch.save(model.state_dict(), os.path.join(args.results_dir, "s_{}_checkpoint.pt".format(cur)))
     # _,_,_,train_metrics_dict = _train_loop_survival(epoch, model, args.modality, train_loader, optimizer,scheduler, loss_fn)
-    results_dict, val_iauc, acc, total_loss, val_metrics_dict = _summary(args.dataset_factory, model, args.modality, val_loader, loss_fn, all_survival)
+    # results_dict, val_iauc, acc, total_loss, val_metrics_dict,val_cm = _summary(args.dataset_factory, model, args.modality, val_loader, loss_fn, all_survival)
+    results_dict, val_iauc, acc, total_loss, val_metrics_dict  = _summary(
+        args.dataset_factory,
+        model,
+        args.modality,
+        val_loader,
+        loss_fn,
+        all_survival,
+        cls_threshold=cls_threshold,
+        n_bootstraps=bootstrap_n,
+    )
     print('Final val_iauc: {:.3f} | Final Val acc: {:.3f} '.format(
         val_iauc, 
         acc
         ))
 
-    return results_dict, (train_metrics_dict, val_metrics_dict, val_iauc, acc,  total_loss)
+    # return results_dict, (train_metrics_dict, val_metrics_dict, val_iauc, acc,  total_loss, (train_cm, val_cm))
+    return results_dict, (train_metrics_dict, val_metrics_dict, val_iauc, acc,  total_loss),train_results 
 
 def _train_val(datasets, cur, args):
     """   
@@ -794,7 +967,7 @@ def _train_val(datasets, cur, args):
 
     #----> init model
     # model = _init_model(args, cur)
-    model = _init_model(args)  # ， args  _init_model 
+    model = _init_model(args)  # args  _init_model 
     
     #---> init optimizer
     optimizer = _init_optim(args, model)
@@ -803,7 +976,12 @@ def _train_val(datasets, cur, args):
     train_loader, val_loader = _init_loaders(args, train_split, val_split)
     # lr scheduler 
     lr_scheduler = _get_lr_scheduler(args, optimizer, train_loader)
-    #---> do train val
-    results_dict, (train_metrics_dict,val_metrics_dict,val_iauc,acc, total_loss) = _step(cur, args, loss_fn, model, optimizer, lr_scheduler,train_loader, val_loader)
+    # #---> do train val
+    # results_dict, (train_metrics_dict,val_metrics_dict,val_iauc,acc, total_loss, confusion_matrices) = _step(cur, args, loss_fn, model, optimizer, lr_scheduler,train_loader, val_loader)
 
-    return results_dict, (train_metrics_dict,val_metrics_dict, val_iauc, acc,total_loss)
+    # return results_dict, (train_metrics_dict,val_metrics_dict, val_iauc, acc,total_loss, confusion_matrices)
+
+    #---> do train val
+    results_dict, (train_metrics_dict,val_metrics_dict,val_iauc,acc, total_loss),train_results  = _step(cur, args, loss_fn, model, optimizer, lr_scheduler,train_loader, val_loader)
+
+    return results_dict, (train_metrics_dict,val_metrics_dict, val_iauc, acc,total_loss),train_results 

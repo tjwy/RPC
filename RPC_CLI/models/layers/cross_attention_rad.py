@@ -44,7 +44,7 @@ class MMAttention(nn.Module):
         residual_conv_kernel=33,
         eps=1e-8,
         dropout=0.,
-        num_slices = 3, ### slice
+        num_slices = 3, # ## slice
     ):
         super().__init__()
 

@@ -1,0 +1,50 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.ipynb_checkpoints/
+
+# Local environments
+.env
+.venv/
+venv/
+conda-meta/
+
+# Results and logs
+results/
+logs/
+*.log
+*.out
+*.err
+
+# Model weights and checkpoints
+*.pt
+*.pth
+*.ckpt
+*.h5
+checkpoints/
+
+# Raw or derived patient data
+raw_data/
+private_data/
+clinical_data/
+WSI_DATA/
+MR_DATA/
+*.svs
+*.ndpi
+*.tif
+*.tiff
+*.nii
+*.nii.gz
+*.npy
+*.npz
+
+# Large WSI feature bags
+*_features.h5
+feature_bags/
+h5_files/
+
+# Keep only synthetic examples in version control
+!RPC_CLI/datasets_csv/metadata/example_labels.csv
+!RPC_CLI/datasets_csv/metadata/example_clinical.csv
+!RPC_CLI/splits/example_5fold/rpc_example/splits_*.csv
