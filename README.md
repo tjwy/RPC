@@ -121,3 +121,17 @@ See `PRE_DLR/README.md` for the complete dl-mri training and inference recipe.
 - The example CSVs are schema templates, not real data.
 - Clinical feature dimension is controlled by `--pre_adapter_clinical_dim` or the `CLINICAL_DIM` environment variable in the example scripts.
 
+## Acknowledgements
+
+The `RPC_CLI/` pipeline (POST / DLP / DLRP / PRE-CLI / POST-CLI) is adapted
+from the SurvPath framework released by the Mahmood Lab:
+
+- SurvPath: https://github.com/mahmoodlab/SurvPath
+
+We thank the SurvPath authors for open-sourcing their code. The
+multimodal dataset class, training loop, and transformer-based fusion
+modules in `RPC_CLI/` are derived from their implementation, with
+modifications for binary recurrence classification, MRI integration, and
+clinical-only variants. Please cite the original SurvPath paper if you
+build on this part of the codebase.
+
